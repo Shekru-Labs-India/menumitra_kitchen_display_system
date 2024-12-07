@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/menumitra_kitchen_display_system/static/css/main.6285435b.css",
+    "main.js": "/menumitra_kitchen_display_system/static/js/main.64790a08.js",
+    "static/media/logo.png": "/menumitra_kitchen_display_system/static/media/logo.2bf60a61eeb22a2a1e49.png",
+    "index.html": "/menumitra_kitchen_display_system/index.html",
+    "main.6285435b.css.map": "/menumitra_kitchen_display_system/static/css/main.6285435b.css.map",
+    "main.64790a08.js.map": "/menumitra_kitchen_display_system/static/js/main.64790a08.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6285435b.css",
+    "static/js/main.64790a08.js"
+  ]
+}
