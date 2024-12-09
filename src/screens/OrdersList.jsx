@@ -84,7 +84,9 @@ function OrdersList() {
           <div className="row g-3">
             {/* Placed Orders */}
             <div className="col-4">
-              <h4 className="text-center">Placed Orders</h4>
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-secondary py-2 d-flex align-items-center justify-content-center">
+                Placed
+              </h4>
               <div className="row g-3">
                 {placedOrders.map((order) => (
                   <div className="col-12" key={order.order_id}>
@@ -120,7 +122,9 @@ function OrdersList() {
 
             {/* Ongoing Orders */}
             <div className="col-4">
-              <h4 className="text-center">Ongoing Orders</h4>
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-warning py-2 d-flex align-items-center justify-content-center">
+                Ongoing
+              </h4>
               <div className="row g-3">
                 {ongoingOrders.map((order) => (
                   <div className="col-12" key={order.order_id}>
@@ -162,7 +166,9 @@ function OrdersList() {
 
             {/* Completed Orders */}
             <div className="col-4">
-              <h4 className="text-center">Completed Orders</h4>
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-success py-2 d-flex align-items-center justify-content-center">
+                Completed
+              </h4>
               <div className="row g-3">
                 {completedOrders.map((order) => (
                   <div className="col-12" key={order.order_id}>
