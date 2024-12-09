@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
-import "./LoginScreen.css";
+import "./LoginScreen.css"; // Ensure you have this CSS file for additional styles if needed
 
 function LoginScreen() {
   const [mobileNumber, setMobileNumber] = useState("");

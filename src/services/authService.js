@@ -40,7 +40,8 @@ export const authService = {
         localStorage.setItem("ownerId", result.owner_id);
         localStorage.setItem("restaurantName", result.restaurant_name);
         localStorage.setItem("userData", JSON.stringify(result));
-        window.location.href = "/menumitra_kitchen_display_system/orders"; // Navigate to /orders
+        // Navigate to /orders
+        window.location.href = "/menumitra_kitchen_display_system/orders";
       }
       return result;
     } catch (error) {
