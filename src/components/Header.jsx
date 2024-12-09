@@ -4,7 +4,7 @@ import hotelLogo from "../assets/Hotel.png";
 
 function Header() {
   const location = useLocation();
-
+  const restaurantName = localStorage.getItem("restaurantName");
   return (
     <header className="bg-white shadow-sm">
       <nav className="navbar navbar-expand-lg navbar-light py-2">
@@ -17,7 +17,7 @@ function Header() {
               className="me-2 rounded-circle"
               style={{ width: "40px", height: "40px" }}
             />
-            <span className="fs-4 fw-bold">Jagdamba</span>
+            <span className="fs-4 fw-bold">{restaurantName.toUpperCase()}</span>
           </Link>
 
           {/* Hamburger Menu Button */}

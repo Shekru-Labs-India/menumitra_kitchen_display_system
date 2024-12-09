@@ -1,216 +1,204 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function OrdersList() {
+  const [placedOrders, setPlacedOrders] = useState([]);
+  const [ongoingOrders, setOngoingOrders] = useState([]);
+  const [completedOrders, setCompletedOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const restaurantId = localStorage.getItem("restaurantId");
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch(
+        "https://men4u.xyz/kitchen_display_system_api/kds_order_listview",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ restaurant_id: restaurantId }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.st === 1) {
+        setPlacedOrders(result.placed_orders);
+        setOngoingOrders(result.ongoing_orders);
+        setCompletedOrders(result.completed_orders);
+      } else {
+        setError("Failed to fetch orders");
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      setError("Error fetching orders");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId) => {
+    try {
+      const response = await fetch(
+        "https://men4u.xyz/kitchen_display_system_api/kds_update/order_status",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            restaurant_id: restaurantId,
+            order_id: orderId,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.st === 1) {
+        alert(result.msg);
+        fetchOrders(); // Refresh orders after successful update
+      } else {
+        alert("Failed to update order status");
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      alert("Error updating order status");
+    }
+  };
+
   return (
     <div className="min-vh-100 d-flex flex-column bg-light">
       <Header />
 
-      {/* Main Content */}
       <div className="flex-grow-1 p-3">
-        <div className="row g-3">
+        {loading && <div className="text-center mt-5">Loading orders...</div>}
+        {error && (
+          <div className="alert alert-danger text-center mt-5">{error}</div>
+        )}
 
-          {/* Ready Order - Green Card */}
-          <div className="col-3">
-            <div className="card bg-white rounded-3">
-              <div className="card-header bg-success bg-opacity-10 py-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-2 align-items-center">
-                    <p className="fs-3 fw-bold mb-0">
-                      <i class="bx bx-hash"></i>342
-                    </p>
+        {!loading && !error && (
+          <div className="row g-3">
+            {/* Placed Orders */}
+            <div className="col-4">
+              <h4 className="text-center">Placed Orders</h4>
+              <div className="row g-3">
+                {placedOrders.map((order) => (
+                  <div className="col-12" key={order.order_id}>
+                    <div className="card bg-white rounded-3">
+                      <div className="card-header bg-secondary bg-opacity-10 py-2">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <p className="fs-3 fw-bold mb-0">
+                            <i className="bx bx-hash"></i> {order.order_number}
+                          </p>
+                          <p className="mb-0 fs-5 fw-semibold">
+                            {order.section_name
+                              ? `${order.section_name} - ${order.table_number}`
+                              : order.order_type}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card-body p-3">
+                        {order.menu_details.map((menu, index) => (
+                          <div
+                            className="d-flex justify-content-between align-items-center border-start border-secondary border-3 ps-2 mb-2"
+                            key={index}
+                          >
+                            <div className="fw-semibold">{menu.menu_name}</div>
+                            <span>× {menu.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    {/* <p className="mb-0 text-muted">Table</p> */}
-                    <p className="mb-0 fs-5 fw-semibold">Garden - 1</p>
-                  </div>
-                </div>
-                <div className="mt-1"></div>
+                ))}
               </div>
-              <div className="card-body p-3">
-                <div className="d-flex flex-column gap-2">
-                  <div className="d-flex flex-column gap-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span className="fs-6">× 1</span>
-                    </div>
+            </div>
 
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
+            {/* Ongoing Orders */}
+            <div className="col-4">
+              <h4 className="text-center">Ongoing Orders</h4>
+              <div className="row g-3">
+                {ongoingOrders.map((order) => (
+                  <div className="col-12" key={order.order_id}>
+                    <div className="card bg-white rounded-3">
+                      <div className="card-header bg-warning bg-opacity-10 py-2">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <p className="fs-3 fw-bold mb-0">
+                            <i className="bx bx-hash"></i> {order.order_number}
+                          </p>
+                          <p className="mb-0 fs-5 fw-semibold">
+                            {order.section_name
+                              ? `${order.section_name} - ${order.table_number}`
+                              : order.order_type}
+                          </p>
                         </div>
                       </div>
-                      <span>× 1</span>
+                      <div className="card-body p-3">
+                        {order.menu_details.map((menu, index) => (
+                          <div
+                            className="d-flex justify-content-between align-items-center border-start border-warning border-3 ps-2 mb-2"
+                            key={index}
+                          >
+                            <div className="fw-semibold">{menu.menu_name}</div>
+                            <span>× {menu.quantity}</span>
+                          </div>
+                        ))}
+                        <button
+                          className="btn btn-success w-100 mt-3"
+                          onClick={() => updateOrderStatus(order.order_id)}
+                        >
+                          Complete Order
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="mt-5">
-                  <button className="btn btn-outline-success w-100">
-                    <i class="bx bx-check-circle me-2"></i>
-                    Completed
-                  </button>
-                </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Completed Orders */}
+            <div className="col-4">
+              <h4 className="text-center">Completed Orders</h4>
+              <div className="row g-3">
+                {completedOrders.map((order) => (
+                  <div className="col-12" key={order.order_id}>
+                    <div className="card bg-white rounded-3">
+                      <div className="card-header bg-success bg-opacity-10 py-2">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <p className="fs-3 fw-bold mb-0">
+                            <i className="bx bx-hash"></i> {order.order_number}
+                          </p>
+                          <p className="mb-0 fs-5 fw-semibold">
+                            {order.section_name
+                              ? `${order.section_name} - ${order.table_number}`
+                              : order.order_type}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="card-body p-3">
+                        {order.menu_details.map((menu, index) => (
+                          <div
+                            className="d-flex justify-content-between align-items-center border-start border-success border-3 ps-2 mb-2"
+                            key={index}
+                          >
+                            <div className="fw-semibold">{menu.menu_name}</div>
+                            <span>× {menu.quantity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-          <div className="col-3">
-            <div className="card bg-white rounded-3">
-              <div className="card-header bg-success bg-opacity-10 py-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-2 align-items-center">
-                    <p className="fs-3 fw-bold mb-0">
-                      <i class="bx bx-hash"></i>342
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    {/* <p className="mb-0 text-muted">Table</p> */}
-                    <p className="mb-0 fs-5 fw-semibold">Garden - 1</p>
-                  </div>
-                </div>
-                <div className="mt-1"></div>
-              </div>
-              <div className="card-body p-3">
-                <div className="d-flex flex-column gap-2">
-                  <div className="d-flex flex-column gap-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span className="fs-6">× 1</span>
-                    </div>
-
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span>× 1</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-5">
-                  <button className="btn btn-outline-success w-100">
-                    <i class="bx bx-check-circle me-2"></i>
-                    Completed
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-3">
-            <div className="card bg-white rounded-3">
-              <div className="card-header bg-success bg-opacity-10 py-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-2 align-items-center">
-                    <p className="fs-3 fw-bold mb-0">
-                      <i class="bx bx-hash"></i>342
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    {/* <p className="mb-0 text-muted">Table</p> */}
-                    <p className="mb-0 fs-5 fw-semibold">Garden - 1</p>
-                  </div>
-                </div>
-                <div className="mt-1"></div>
-              </div>
-              <div className="card-body p-3">
-                <div className="d-flex flex-column gap-2">
-                  <div className="d-flex flex-column gap-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span className="fs-6">× 1</span>
-                    </div>
-
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span>× 1</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-5">
-                  <button className="btn btn-outline-success w-100">
-                    <i class="bx bx-check-circle me-2"></i>
-                    Completed
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col-3">
-            <div className="card bg-white rounded-3">
-              <div className="card-header bg-success bg-opacity-10 py-2">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex gap-2 align-items-center">
-                    <p className="fs-3 fw-bold mb-0">
-                      <i class="bx bx-hash"></i>342
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    {/* <p className="mb-0 text-muted">Table</p> */}
-                    <p className="mb-0 fs-5 fw-semibold">Garden - 1</p>
-                  </div>
-                </div>
-                <div className="mt-1"></div>
-              </div>
-              <div className="card-body p-3">
-                <div className="d-flex flex-column gap-2">
-                  <div className="d-flex flex-column gap-2">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span className="fs-6">× 1</span>
-                    </div>
-
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center gap-2 border-start border-success border-3 ps-2">
-                        <div className="fw-semibold fs-6">Cheese Veg Wrap</div>
-                        <div>
-                          <small className="text-muted ">Regular</small>
-                        </div>
-                      </div>
-                      <span>× 1</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-5">
-                  <button className="btn btn-outline-success w-100">
-                    <i class="bx bx-check-circle me-2"></i>
-                    Completed
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-         
-        </div>
+        )}
       </div>
+
       <Footer />
     </div>
   );
