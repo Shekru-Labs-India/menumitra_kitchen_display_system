@@ -37,12 +37,14 @@ function LoginScreen() {
     setLoading(true);
     try {
       const result = await authService.verifyOTP(mobileNumber, otp);
-      if (result.success) {
-        localStorage.setItem("userToken", result.token);
-        localStorage.setItem("userData", JSON.stringify(result.userData)); // Store user data
+      if (result.st === 1) {
+        localStorage.setItem("restaurantId", result.restaurant_id);
+        localStorage.setItem("ownerId", result.owner_id);
+        localStorage.setItem("restaurantName", result.restaurant_name);
+        localStorage.setItem("userData", JSON.stringify(result));
         navigate("/orders");
       } else {
-        setError(result.error || "Invalid OTP");
+        setError(result.msg || "Invalid OTP");
       }
     } catch (err) {
       setError("Failed to verify OTP");
@@ -92,7 +94,7 @@ function LoginScreen() {
               <div className="card-body p-5">
                 <div className="text-center mb-4">
                   <h2 className="fw-bold text-primary">MenuMitra</h2>
-                  <p className="text-muted">Customer Display System</p>
+                  <p className="text-muted">Kitchen Display System</p>
                 </div>
 
                 {error && (

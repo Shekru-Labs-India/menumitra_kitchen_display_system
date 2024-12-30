@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function OrdersList() {
+  const navigate = useNavigate();
   const [placedOrders, setPlacedOrders] = useState([]);
-  const [ongoingOrders, setOngoingOrders] = useState([]);
-  const [completedOrders, setCompletedOrders] = useState([]);
+  const [cookingOrders, setCookingOrders] = useState([]);
+  const [paidOrders, setPaidOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const restaurantId = localStorage.getItem("restaurantId");
 
   useEffect(() => {
+    if (!restaurantId) {
+      navigate("/login");
+      return;
+    }
     fetchOrders();
-  }, []);
+  }, [navigate]);
 
   const fetchOrders = async () => {
     try {
@@ -26,13 +32,14 @@ function OrdersList() {
       );
 
       const result = await response.json();
+      console.log("API Response:", result); // Debug log
 
       if (result.st === 1) {
-        setPlacedOrders(result.placed_orders);
-        setOngoingOrders(result.ongoing_orders);
-        setCompletedOrders(result.completed_orders);
+        setPlacedOrders(result.placed_orders || []);
+        setCookingOrders(result.cooking_orders || []);
+        setPaidOrders(result.paid_orders || []);
       } else {
-        setError("Failed to fetch orders");
+        setError(result.msg || "Failed to fetch orders");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -41,6 +48,12 @@ function OrdersList() {
       setLoading(false);
     }
   };
+
+  // useEffect(() => {
+  //   fetchOrders();
+  // }, [1000]);
+
+  setInterval(fetchOrders, 10000);
 
   const updateOrderStatus = async (orderId) => {
     try {
@@ -62,12 +75,55 @@ function OrdersList() {
         alert(result.msg);
         fetchOrders(); // Refresh orders after successful update
       } else {
-        alert("Failed to update order status");
+        alert(result.msg || "Failed to update order status");
       }
     } catch (error) {
       console.error("Error updating order status:", error);
       alert("Error updating order status");
     }
+  };
+
+  // Add null checks before mapping
+  const renderOrders = (orders, type) => {
+    if (!Array.isArray(orders)) return null;
+    
+    return orders.map((order) => (
+      <div className="col-12" key={order.order_id}>
+        <div className="card bg-white rounded-3">
+          <div className={`card-header bg-${type} bg-opacity-10 py-2`}>
+            <div className="d-flex justify-content-between align-items-center">
+              <p className="fs-3 fw-bold mb-0">
+                <i className="bx bx-hash"></i> {order.order_number}
+              </p>
+              <p className="mb-0 fs-5 fw-semibold">
+                {order.section_name
+                  ? `${order.section_name} - ${order.table_number}`
+                  : order.order_type}
+              </p>
+            </div>
+          </div>
+          <div className="card-body p-3">
+            {Array.isArray(order.menu_details) && order.menu_details.map((menu, index) => (
+              <div
+                className={`d-flex justify-content-between align-items-center border-start border-${type} border-3 ps-2 mb-2`}
+                key={index}
+              >
+                <div className="fw-semibold">{menu.menu_name}</div>
+                <span>× {menu.quantity}</span>
+              </div>
+            ))}
+            {type === 'warning' && (
+              <button
+                className="btn btn-success w-100 mt-3"
+                onClick={() => updateOrderStatus(order.order_id)}
+              >
+                Complete Order
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    ));
   };
 
   return (
@@ -84,121 +140,31 @@ function OrdersList() {
           <div className="row g-3">
             {/* Placed Orders */}
             <div className="col-4">
-              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-secondary py-2 d-flex align-items-center justify-content-center">
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-secondary py-2 d-flex align-items-center justify-content-center rounded-4">
                 Placed
               </h4>
               <div className="row g-3">
-                {placedOrders.map((order) => (
-                  <div className="col-12" key={order.order_id}>
-                    <div className="card bg-white rounded-3">
-                      <div className="card-header bg-secondary bg-opacity-10 py-2">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <p className="fs-3 fw-bold mb-0">
-                            <i className="bx bx-hash"></i> {order.order_number}
-                          </p>
-                          <p className="mb-0 fs-5 fw-semibold">
-                            {order.section_name
-                              ? `${order.section_name} - ${order.table_number}`
-                              : order.order_type}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card-body p-3">
-                        {order.menu_details.map((menu, index) => (
-                          <div
-                            className="d-flex justify-content-between align-items-center border-start border-secondary border-3 ps-2 mb-2"
-                            key={index}
-                          >
-                            <div className="fw-semibold">{menu.menu_name}</div>
-                            <span>× {menu.quantity}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {renderOrders(placedOrders, 'secondary')}
               </div>
             </div>
 
-            {/* Ongoing Orders */}
+            {/* Cooking Orders (previously Ongoing) */}
             <div className="col-4">
-              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-warning py-2 d-flex align-items-center justify-content-center">
-                Ongoing
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-warning py-2 d-flex align-items-center justify-content-center rounded-4">
+                Cooking
               </h4>
               <div className="row g-3">
-                {ongoingOrders.map((order) => (
-                  <div className="col-12" key={order.order_id}>
-                    <div className="card bg-white rounded-3">
-                      <div className="card-header bg-warning bg-opacity-10 py-2">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <p className="fs-3 fw-bold mb-0">
-                            <i className="bx bx-hash"></i> {order.order_number}
-                          </p>
-                          <p className="mb-0 fs-5 fw-semibold">
-                            {order.section_name
-                              ? `${order.section_name} - ${order.table_number}`
-                              : order.order_type}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card-body p-3">
-                        {order.menu_details.map((menu, index) => (
-                          <div
-                            className="d-flex justify-content-between align-items-center border-start border-warning border-3 ps-2 mb-2"
-                            key={index}
-                          >
-                            <div className="fw-semibold">{menu.menu_name}</div>
-                            <span>× {menu.quantity}</span>
-                          </div>
-                        ))}
-                        <button
-                          className="btn btn-success w-100 mt-3"
-                          onClick={() => updateOrderStatus(order.order_id)}
-                        >
-                          Complete Order
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {renderOrders(cookingOrders, 'warning')}
               </div>
             </div>
 
-            {/* Completed Orders */}
+            {/* Paid Orders (previously Completed) */}
             <div className="col-4">
-              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-success py-2 d-flex align-items-center justify-content-center">
-                Completed
+              <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-success py-2 d-flex align-items-center justify-content-center rounded-4">
+                Paid
               </h4>
               <div className="row g-3">
-                {completedOrders.map((order) => (
-                  <div className="col-12" key={order.order_id}>
-                    <div className="card bg-white rounded-3">
-                      <div className="card-header bg-success bg-opacity-10 py-2">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <p className="fs-3 fw-bold mb-0">
-                            <i className="bx bx-hash"></i> {order.order_number}
-                          </p>
-                          <p className="mb-0 fs-5 fw-semibold">
-                            {order.section_name
-                              ? `${order.section_name} - ${order.table_number}`
-                              : order.order_type}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="card-body p-3">
-                        {order.menu_details.map((menu, index) => (
-                          <div
-                            className="d-flex justify-content-between align-items-center border-start border-success border-3 ps-2 mb-2"
-                            key={index}
-                          >
-                            <div className="fw-semibold">{menu.menu_name}</div>
-                            <span>× {menu.quantity}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {renderOrders(paidOrders, 'success')}
               </div>
             </div>
           </div>

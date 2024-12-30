@@ -6,7 +6,7 @@ import OrdersList from "./screens/OrdersList";
 
 function App() {
   return (
-    <BrowserRouter basename="/menumitra_kitchen_display_system">
+    <BrowserRouter basename="/">
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginScreen />} />

@@ -34,19 +34,10 @@ export const authService = {
         }
       );
       const result = await response.json();
-      if (result.st === 1) {
-        // Save data to local storage
-        localStorage.setItem("restaurantId", result.restaurant_id);
-        localStorage.setItem("ownerId", result.owner_id);
-        localStorage.setItem("restaurantName", result.restaurant_name);
-        localStorage.setItem("userData", JSON.stringify(result));
-        // Navigate to /orders
-        window.location.href = "/menumitra_kitchen_display_system/orders";
-      }
-      return result;
+      return result; // Return the complete result object
     } catch (error) {
       console.error("OTP Verification Error:", error);
-      return { success: false, error: "Failed to verify OTP" };
+      return { st: 0, msg: "Failed to verify OTP" };
     }
   },
 };
