@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -10,7 +10,7 @@ function OrdersList() {
   const [error, setError] = useState(null);
   const restaurantId = localStorage.getItem("restaurantId");
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const response = await fetch(
         "https://men4u.xyz/kitchen_display_system_api/kds_order_listview",
@@ -36,10 +36,11 @@ function OrdersList() {
     } finally {
       setLoading(false);
     }
-  };
- useEffect(() => {
-   fetchOrders();
- }, [fetchOrders]); 
+  }, [restaurantId]); // Add 'restaurantId' as a dependency
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const updateOrderStatus = async (orderId) => {
     try {
