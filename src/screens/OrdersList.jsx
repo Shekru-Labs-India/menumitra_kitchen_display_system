@@ -9,9 +9,6 @@ function OrdersList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const restaurantId = localStorage.getItem("restaurantId");
- useEffect(() => {
-   fetchOrders();
- }, [fetchOrders]); 
 
   const fetchOrders = async () => {
     try {
@@ -40,6 +37,9 @@ function OrdersList() {
       setLoading(false);
     }
   };
+ useEffect(() => {
+   fetchOrders();
+ }, [fetchOrders]); 
 
   const updateOrderStatus = async (orderId) => {
     try {
