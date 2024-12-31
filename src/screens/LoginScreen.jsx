@@ -38,9 +38,9 @@ function LoginScreen() {
     try {
       const result = await authService.verifyOTP(mobileNumber, otp);
       if (result.st === 1) {
-        localStorage.setItem("restaurantId", result.restaurant_id);
+        localStorage.setItem("outlet_id", result.outlet_id);
         localStorage.setItem("ownerId", result.owner_id);
-        localStorage.setItem("restaurantName", result.restaurant_name);
+        localStorage.setItem("outletName", result.outlet_name);
         localStorage.setItem("userData", JSON.stringify(result));
         navigate("/orders");
       } else {

@@ -10,10 +10,10 @@ function OrdersList() {
   const [paidOrders, setPaidOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const restaurantId = localStorage.getItem("restaurantId");
+  const outletId = localStorage.getItem("outlet_id");
 
   useEffect(() => {
-    if (!restaurantId) {
+    if (!outletId) {
       navigate("/login");
       return;
     }
@@ -27,7 +27,7 @@ function OrdersList() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ restaurant_id: restaurantId }),
+          body: JSON.stringify({ outlet_id: outletId }),
         }
       );
 
@@ -63,7 +63,7 @@ function OrdersList() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            restaurant_id: restaurantId,
+            outlet_id: outletId,
             order_id: orderId,
           }),
         }

@@ -4,7 +4,7 @@ import hotelLogo from "../assets/Hotel.png";
 
 function Header() {
   const location = useLocation();
-  const restaurantName = localStorage.getItem("restaurantName");
+  const outletName = localStorage.getItem("outletName");
 
   const handleLogout = () => {
     // Clear all localStorage items
@@ -24,7 +24,7 @@ function Header() {
               className="me-2 rounded-circle"
               style={{ width: "40px", height: "40px" }}
             />
-            <span className="fs-4 fw-bold">{restaurantName?.toUpperCase()}</span>
+            <span className="fs-4 fw-bold">{outletName?.toUpperCase()}</span>
           </Link>
 
           {/* Call Waiter Button */}
