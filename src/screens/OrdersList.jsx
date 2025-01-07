@@ -65,6 +65,7 @@ function OrdersList() {
           body: JSON.stringify({
             outlet_id: outletId,
             order_id: orderId,
+            order_status: "served",
           }),
         }
       );
