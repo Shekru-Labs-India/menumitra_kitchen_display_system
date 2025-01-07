@@ -1,7 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+
+const styles = `
+  .circular-countdown {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+  }
+
+  .circular-timer {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+
+  .timer-text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .font_size_14 {
+    font-size: 14px;
+  }
+
+  .font_size_12 {
+    font-size: 12px;
+  }
+`;
+
+// Add styles to document head
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
 
 function OrdersList() {
   const navigate = useNavigate();
@@ -18,6 +55,12 @@ function OrdersList() {
       return;
     }
     fetchOrders();
+
+    // Set up polling interval
+    const intervalId = setInterval(fetchOrders, 10000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
   }, [navigate]);
 
   const fetchOrders = async () => {
@@ -48,12 +91,6 @@ function OrdersList() {
       setLoading(false);
     }
   };
-
-  // useEffect(() => {
-  //   fetchOrders();
-  // }, [1000]);
-
-  setInterval(fetchOrders, 10000);
 
   const updateOrderStatus = async (orderId) => {
     try {
@@ -110,7 +147,12 @@ function OrdersList() {
                 key={index}
               >
                 <div className="fw-semibold">{menu.menu_name}</div>
-                <span>× {menu.quantity}</span>
+                <div className="d-flex align-items-center gap-2">
+                  <span>× {menu.quantity}</span>
+                  {type === 'secondary' && index === 0 && (
+                    <span className="text-muted">{order.timeLeft}</span>
+                  )}
+                </div>
               </div>
             ))}
             {type === 'warning' && (
@@ -121,10 +163,173 @@ function OrdersList() {
                 Complete Order
               </button>
             )}
+            {type === 'secondary' && (
+              <div className="d-flex justify-content-end">
+                <CircularCountdown orderId={order.order_id} order={order} />
+              </div>
+            )}
           </div>
         </div>
       </div>
     ));
+  };
+
+  const TimeRemaining = ({ orderId, order }) => {
+    const [timeLeft, setTimeLeft] = useState(90);
+    const [isExpired, setIsExpired] = useState(false);
+    const timerRef = useRef(null);
+
+    useEffect(() => {
+      const getOrderTimeInMs = (timeStr) => {
+        if (!timeStr) return null;
+        const now = new Date();
+        const [time, period] = timeStr.split(" ");
+        const [hours, minutes] = time.split(":");
+        let hrs = parseInt(hours);
+        
+        // Convert to 24 hour format
+        if (period === "PM" && hrs !== 12) hrs += 12;
+        if (period === "AM" && hrs === 12) hrs = 0;
+        
+        const orderDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          hrs,
+          parseInt(minutes)
+        );
+        
+        // If order time is in future, it must be from previous day
+        if (orderDate > now) {
+          orderDate.setDate(orderDate.getDate() - 1);
+        }
+        
+        return orderDate.getTime();
+      };
+
+      const orderTimeMs = getOrderTimeInMs(order?.date_time);
+      if (!orderTimeMs) {
+        setIsExpired(true);
+        return;
+      }
+
+      const calculateTimeLeft = () => {
+        const now = new Date().getTime();
+        const elapsed = now - orderTimeMs;
+        const remaining = Math.max(90 - Math.floor(elapsed / 1000), 0);
+
+        if (remaining === 0) {
+          setIsExpired(true);
+          clearInterval(timerRef.current);
+          return;
+        }
+        setTimeLeft(remaining);
+      };
+
+      calculateTimeLeft();
+      timerRef.current = setInterval(calculateTimeLeft, 1000);
+
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    }, [orderId, order?.date_time]);
+
+    if (isExpired || timeLeft === 0) return null;
+    return timeLeft;
+  };
+
+  const CircularCountdown = ({ orderId, order }) => {
+    const [timeLeft, setTimeLeft] = useState(90);
+    const [isExpired, setIsExpired] = useState(false);
+    const timerRef = useRef(null);
+
+    useEffect(() => {
+      const getOrderTimeInMs = (timeStr) => {
+        if (!timeStr) return null;
+        const now = new Date();
+        const [time, period] = timeStr.split(" ");
+        const [hours, minutes] = time.split(":");
+        let hrs = parseInt(hours);
+        
+        // Convert to 24 hour format
+        if (period === "PM" && hrs !== 12) hrs += 12;
+        if (period === "AM" && hrs === 12) hrs = 0;
+        
+        const orderDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          hrs,
+          parseInt(minutes)
+        );
+        
+        // If order time is in future, it must be from previous day
+        if (orderDate > now) {
+          orderDate.setDate(orderDate.getDate() - 1);
+        }
+        
+        return orderDate.getTime();
+      };
+
+      const orderTimeMs = getOrderTimeInMs(order?.date_time);
+      if (!orderTimeMs) {
+        setIsExpired(true);
+        return;
+      }
+
+      const calculateTimeLeft = () => {
+        const now = new Date().getTime();
+        const elapsed = now - orderTimeMs;
+        const remaining = Math.max(90 - Math.floor(elapsed / 1000), 0);
+
+        if (remaining === 0) {
+          setIsExpired(true);
+          clearInterval(timerRef.current);
+          return;
+        }
+        setTimeLeft(remaining);
+      };
+
+      calculateTimeLeft();
+      timerRef.current = setInterval(calculateTimeLeft, 1000);
+
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+      };
+    }, [orderId, order?.date_time]);
+
+    if (isExpired || timeLeft === 0) return null;
+
+    const percentage = (timeLeft / 90) * 100;
+
+    return (
+      <div className="circular-countdown">
+        <svg viewBox="0 0 36 36" className="circular-timer">
+          <path
+            d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none"
+            stroke="#eee"
+            strokeWidth="3"
+          />
+          <path
+            d="M18 2.0845
+              a 15.9155 15.9155 0 0 1 0 31.831
+              a 15.9155 15.9155 0 0 1 0 -31.831"
+            fill="none"
+            stroke="#2196f3"
+            strokeWidth="3"
+            strokeDasharray={`${percentage}, 100`}
+          />
+        </svg>
+        <div className="timer-text-overlay text-dark">{timeLeft}s</div>
+      </div>
+    );
   };
 
   return (
