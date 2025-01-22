@@ -35,24 +35,32 @@ function LoginScreen() {
     e.preventDefault();
     setError("");
     setLoading(true);
+  
     try {
       const result = await authService.verifyOTP(mobileNumber, otp);
+  
       if (result.st === 1) {
-        localStorage.setItem("outlet_id", result.outlet_id);
-        localStorage.setItem("ownerId", result.owner_id);
-        localStorage.setItem("outletName", result.outlet_name);
-        localStorage.setItem("userData", JSON.stringify(result));
+        const { name, outlet_id, outlet_name, role } = result.Data;
+  
+        // Save extracted data to localStorage
+        localStorage.setItem("outlet_id", outlet_id);
+        localStorage.setItem("outlet_name", outlet_name);
+        localStorage.setItem("role", role);
+        localStorage.setItem("userData", JSON.stringify(result.Data));
+  
+        // Navigate to the orders page
         navigate("/orders");
       } else {
         setError(result.msg || "Invalid OTP");
       }
     } catch (err) {
       setError("Failed to verify OTP");
+      console.error("OTP Submit Error:", err);
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return;
     const newOtpValues = [...otpValues];

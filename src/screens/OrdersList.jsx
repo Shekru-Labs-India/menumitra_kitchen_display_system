@@ -67,7 +67,7 @@ function OrdersList() {
   const fetchOrders = async () => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/kitchen_display_system_api/kds_order_listview",
+        "https://men4u.xyz/common_api/order_listview",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -107,7 +107,7 @@ function OrdersList() {
   const updateOrderStatus = async (orderId) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/kitchen_display_system_api/kds_update/order_status",
+        "https://men4u.xyz/common_api/update_order_status",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -169,7 +169,7 @@ function OrdersList() {
     const handleRejectOrder = async () => {
       try {
         const response = await fetch(
-          "https://men4u.xyz/kitchen_display_system_api/kds_update/order_status",
+          "https://men4u.xyz/common_api/update_order_status",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

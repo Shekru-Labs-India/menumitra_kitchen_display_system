@@ -3,11 +3,11 @@ export const authService = {
   sendOTP: async (mobileNumber) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/kitchen_display_system_api/kds_login",
+        "https://men4u.xyz/common_api/user_login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mobile: mobileNumber }),
+          body: JSON.stringify({ mobile: mobileNumber,role:'kds' }),
         }
       );
       const result = await response.json();
@@ -26,11 +26,15 @@ export const authService = {
   verifyOTP: async (mobileNumber, otp) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
+        "https://men4u.xyz/common_api/check_otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mobile: mobileNumber, otp }),
+          body: JSON.stringify({ mobile: mobileNumber, otp,
+            role: "kds",
+            fcm_token: "1",
+            device_sessid: "1"
+           }),
         }
       );
       const result = await response.json();
