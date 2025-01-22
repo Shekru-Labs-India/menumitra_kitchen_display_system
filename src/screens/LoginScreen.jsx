@@ -40,8 +40,8 @@ function LoginScreen() {
       const result = await authService.verifyOTP(mobileNumber, otp);
   
       if (result.st === 1) {
-        const { name, outlet_id, outlet_name, role } = result;
-  
+        const { name, outlet_id, outlet_name, role ,user_id } = result;
+        localStorage.setItem("user_id", user_id);
         // Save extracted data to localStorage
         localStorage.setItem("outlet_id", outlet_id);
         localStorage.setItem("outlet_name", outlet_name);

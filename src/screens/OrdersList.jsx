@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -49,7 +49,7 @@ function OrdersList() {
   const [error, setError] = useState(null);
   const [previousMenuItems, setPreviousMenuItems] = useState({});
   const outletId = localStorage.getItem("outlet_id");
-
+  const userId = localStorage.getItem("user_id");
   useEffect(() => {
     if (!outletId) {
       navigate("/login");
@@ -67,7 +67,7 @@ function OrdersList() {
   const fetchOrders = async () => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/order_listview",
+        "https://men4u.xyz/common_api/cds_kds_order_listview",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -115,6 +115,7 @@ function OrdersList() {
             outlet_id: outletId,
             order_id: orderId,
             order_status: "served",
+            user_id: userId,
           }),
         }
       );
@@ -177,6 +178,7 @@ function OrdersList() {
               outlet_id: localStorage.getItem("outlet_id"),
               order_id: orderId,
               order_status: "cancelled",
+              user_id: localStorage.getItem("user_id"),
             }),
           }
         );
