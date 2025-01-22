@@ -26,14 +26,14 @@ export const authService = {
   verifyOTP: async (mobileNumber, otp) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/check_otp",
+        "https://men4u.xyz/customer_display_system_api/cds_verify_otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ mobile: mobileNumber, otp,
-            role: "kds",
-            fcm_token: "1",
-            device_sessid: "1"
+            // role: "kds",
+            // fcm_token: "1",
+            // device_sessid: "1"
            }),
         }
       );

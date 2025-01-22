@@ -40,13 +40,13 @@ function LoginScreen() {
       const result = await authService.verifyOTP(mobileNumber, otp);
   
       if (result.st === 1) {
-        const { name, outlet_id, outlet_name, role } = result.Data;
+        const { name, outlet_id, outlet_name, role } = result;
   
         // Save extracted data to localStorage
         localStorage.setItem("outlet_id", outlet_id);
         localStorage.setItem("outlet_name", outlet_name);
         localStorage.setItem("role", role);
-        localStorage.setItem("userData", JSON.stringify(result.Data));
+        localStorage.setItem("userData", JSON.stringify(result));
   
         // Navigate to the orders page
         navigate("/orders");
