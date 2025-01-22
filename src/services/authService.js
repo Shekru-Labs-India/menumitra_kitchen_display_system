@@ -7,7 +7,7 @@ export const authService = {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mobile: mobileNumber,role:'kds' }),
+          body: JSON.stringify({ mobile: mobileNumber,role:'manager' }),
         }
       );
       const result = await response.json();
@@ -26,7 +26,7 @@ export const authService = {
   verifyOTP: async (mobileNumber, otp) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/customer_display_system_api/cds_verify_otp",
+        "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
