@@ -4,7 +4,7 @@ import hotelLogo from "../assets/Hotel.png";
 
 function Header() {
   const location = useLocation();
-  const outletName = localStorage.getItem("outletName");
+  const outletName = localStorage.getItem("outlet_name");
 
   const handleLogout = () => {
     // Clear all localStorage items
