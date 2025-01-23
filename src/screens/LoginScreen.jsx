@@ -40,14 +40,14 @@ function LoginScreen() {
       const result = await authService.verifyOTP(mobileNumber, otp);
   
       if (result.st === 1) {
-        const { name, outlet_id, outlet_name, role ,user_id } = result;
+        const { name, outlet_id, outlet_name, role ,user_id ,image } = result;
         localStorage.setItem("user_id", user_id);
         // Save extracted data to localStorage
         localStorage.setItem("outlet_id", outlet_id);
         localStorage.setItem("outlet_name", outlet_name);
         localStorage.setItem("role", role);
         localStorage.setItem("userData", JSON.stringify(result));
-  
+  localStorage.setItem("image",image)
         // Navigate to the orders page
         navigate("/orders");
       } else {

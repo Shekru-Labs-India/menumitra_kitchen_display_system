@@ -50,6 +50,7 @@ function OrdersList() {
   const [previousMenuItems, setPreviousMenuItems] = useState({});
   const outletId = localStorage.getItem("outlet_id");
   const userId = localStorage.getItem("user_id");
+  
   useEffect(() => {
     if (!outletId) {
       navigate("/login");
@@ -280,7 +281,7 @@ function OrdersList() {
                 <p className="fs-3 fw-bold mb-0">
                   <i className="bx bx-hash"></i> {order.order_number}
                 </p>
-                <p className="mb-0 fs-5 fw-semibold">
+                <p className="mb-0 fs-5 text-capitalize fw-semibold">
                   {order.section_name
                     ? `${order.section_name} - ${order.table_number}`
                     : order.order_type}
@@ -295,10 +296,13 @@ function OrdersList() {
                     className={`d-flex justify-content-between align-items-center border-start border-${type} border-3 ps-2 mb-2`}
                     key={index}
                   >
-                    <div className={`fw-semibold ${isNewItem ? 'text-danger' : ''}`}>
+                    <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
                       {menu.menu_name}
                     </div>
-                    <div className="d-flex align-items-center gap-2">
+                    <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
+                      {menu.half_or_full}
+                    </div>
+                    <div className="d-flex align-items-center text-end gap-2">
                       <span>× {menu.quantity}</span>
                       {type === 'secondary' && index === 0 && (
                         <span className="text-muted">{order.timeLeft}</span>
