@@ -2,7 +2,9 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import "./LoginScreen.css"; // Ensure you have this CSS file for additional styles if needed
-
+import { messaging } from '../firebase-config';
+import { getToken } from 'firebase/messaging';
+import { VAPID_KEY } from '../config';
 function LoginScreen() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
@@ -12,6 +14,24 @@ function LoginScreen() {
   const navigate = useNavigate();
   const [otpValues, setOtpValues] = useState(["", "", "", ""]);
   const otpRefs = [useRef(), useRef(), useRef(), useRef()];
+
+  const generateFCMToken = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY
+        });
+        console.log("FCM Token:", token);
+        return token;
+      }
+      console.log("Notification permission denied");
+      return null;
+    } catch (error) {
+      console.error("Error generating FCM token:", error);
+      return null;
+    }
+  };
 
   const handleMobileSubmit = async (e) => {
     e.preventDefault();
@@ -31,36 +51,45 @@ function LoginScreen() {
     }
   };
 
-  const handleOtpSubmit = async (e) => {
+  const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-  
+
     try {
-      const result = await authService.verifyOTP(mobileNumber, otp);
-  
-      if (result.st === 1) {
-        const { name, outlet_id, outlet_name, role ,user_id ,image } = result;
-        localStorage.setItem("user_id", user_id);
-        // Save extracted data to localStorage
-        localStorage.setItem("outlet_id", outlet_id);
-        localStorage.setItem("outlet_name", outlet_name);
-        localStorage.setItem("role", role);
-        localStorage.setItem("userData", JSON.stringify(result));
-  localStorage.setItem("image",image)
-        // Navigate to the orders page
+      // Generate FCM token before verifying OTP
+      const fcmToken = await generateFCMToken();
+      if (!fcmToken) {
+        window.showToast("error", "Failed to generate notification token");
+        return;
+      }
+
+      const combinedOtp = otpValues.join("");
+      const response = await authService.verifyOTP(mobileNumber, combinedOtp, fcmToken);
+      
+      if (response.st === 1) {
+        // Store user data in localStorage
+        localStorage.setItem("user_id", response.user_id);
+        localStorage.setItem("outlet_id", response.outlet_id);
+        localStorage.setItem("outlet_name", response.outlet_name);
+        localStorage.setItem("image", response.image);
+        localStorage.setItem("fcmToken", fcmToken); // Store FCM token
+        
+     
         navigate("/orders");
       } else {
-        setError(result.msg || "Invalid OTP");
+        setError(response.msg || "Invalid OTP");
+       
       }
     } catch (err) {
+      console.error("OTP Verification Error:", err);
       setError("Failed to verify OTP");
-      console.error("OTP Submit Error:", err);
+    
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return;
     const newOtpValues = [...otpValues];
@@ -152,7 +181,7 @@ function LoginScreen() {
                     </button>
                   </form>
                 ) : (
-                  <form onSubmit={handleOtpSubmit}>
+                  <form onSubmit={handleVerifyOTP}>
                     <div className="mb-4">
                       <label
                         htmlFor="otp-1"

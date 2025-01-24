@@ -1,3 +1,6 @@
+import axios from "axios";
+import { API_URL } from "../config";
+
 export const authService = {
   // Send OTP
   sendOTP: async (mobileNumber) => {
@@ -23,8 +26,7 @@ export const authService = {
   },
 
   // Verify OTP
-  verifyOTP: async (mobileNumber, otp) => {
-    // Function to generate a random alphanumeric string of specified length
+  verifyOTP: async (mobile, otp, fcmToken) => {
     const generateRandomSessionId = (length) => {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
       let sessionId = "";
@@ -36,25 +38,28 @@ export const authService = {
 
     // Generate a 20-character session ID
     const deviceSessId = generateRandomSessionId(20);
+  
+    
+      try {
+        const response = await fetch(
+          "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              mobile: mobile,
 
-    try {
-      const response = await fetch(
-        "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            mobile: mobileNumber,
-            otp,
-            device_sessid: deviceSessId, // Pass the generated session ID
-          }),
-        }
-      );
-      const result = await response.json();
-      return result; // Return the complete result object
-    } catch (error) {
-      console.error("OTP Verification Error:", error);
-      return { st: 0, msg: "Failed to verify OTP" };
-    }
-  },
-};
+              otp,
+              fcm_token: fcmToken ,
+              device_sessid: deviceSessId, // Pass the generated session ID
+            }),
+          }
+        );
+        const result = await response.json();
+        return result; // Return the complete result object
+      } catch (error) {
+        console.error("OTP Verification Error:", error);
+        return { st: 0, msg: "Failed to verify OTP" };
+      }
+    },
+  };

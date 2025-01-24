@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef, use } from "react";
 import { Link, useLocation } from "react-router-dom";
 import hotelLogo from "../assets/Hotel.png";
+import { messaging } from '../firebase-config';
+import { getToken, onMessage } from 'firebase/messaging';
+import { VAPID_KEY } from '../config';
 import axios from 'axios';
 function Header() {
   const location = useLocation();
@@ -45,6 +48,85 @@ function Header() {
         setLoading(false);
     }
 };
+
+
+
+const [fcmToken, setFcmToken] = useState(null);
+const BEARER_TOKEN = "ya29.a0AXeO80SFq8nJtSIvzwC2kSl5hxOnp8WNrXxLikOi-fYSCf27pzfQ4_GBxT-xzVeoIIsVnQmdTiNpxWa-mAFsO3YaDap0yfuENzM2SRe02crTSfkQV5ga9HTxEuU5zRznzxbX2KAFlrEmSPSQDON8MlvV5mLQYCHofvAJEghpaCgYKAbYSARESFQHGX2MiQo_N-7s-Tq58N9jy6mnCRw0175";
+useEffect(() => {
+  const setupFCM = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY
+        });
+        setFcmToken(token);
+        localStorage.setItem("fcmToken", token);
+        console.log("FCM Token:", token);
+      }
+    } catch (error) {
+      console.error("Error setting up FCM:", error);
+    }
+  };
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/firebase-messaging-sw.js')
+      .then(function(registration) {
+        console.log('Service Worker registered successfully');
+        setupFCM();
+      })
+      .catch(function(err) {
+        console.error('Service Worker registration failed:', err);
+      });
+  }
+
+  const unsubscribe = onMessage(messaging, (payload) => {
+    window.showToast('Received foreground message:', payload);
+    new Notification(payload.notification.title, {
+      body: payload.notification.body,
+    });
+  });
+
+  return () => unsubscribe();
+}, []);
+
+const sendTestNotification = async () => {
+  const token = localStorage.getItem("fcmToken");
+  if (!token) {
+    alert("FCM token not found!");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      'https://fcm.googleapis.com/v1/projects/menumitra-83831/messages:send',
+      {
+        message: {
+          token: token,
+          notification: {
+            title: "Test Notification",
+            body: "This is a test notification from MenuMitra"
+          }
+        }
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${BEARER_TOKEN}`,
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+
+    window.showToast('Notification sent successfully:', response.data);
+  } catch (error) {
+    console.error('Error sending notification:', error?.response?.data || error.message);
+    window.showToast('Error sending notification: ' + (error?.response?.data?.error?.message || error.message));
+  }
+};
+
+
   return (
     <header className="bg-white shadow-sm">
       <nav className="navbar navbar-light py-2">
@@ -81,10 +163,20 @@ function Header() {
 
       
 
-      
-
+       
+           
+              <div className="d-flex justify-content-left position-absolute start-50 translate-middle-x">
+            <button
+              className="btn btn-outline-primary"
+              onClick={sendTestNotification}
+            
+            >
+              <i className="bx bx-bell me-2"></i>
+              Test Notification
+            </button>
+          </div>
           {/* Call Waiter Button */}
-          <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
+          {/* <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
             <button
               className="btn btn-outline-primary"
             onClick={handleCallWaiter}
@@ -93,7 +185,7 @@ function Header() {
               <i className="bx bx-bell me-2"></i>
               Call Waiter
             </button>
-          </div>
+          </div> */}
 
           {/* Logout Button - Always Visible */}
           <div className="d-flex align-items-center">

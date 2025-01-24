@@ -93,7 +93,7 @@ function OrdersList() {
 
         setPlacedOrders(result.placed_orders || []);
         setCookingOrders(result.cooking_orders || []);
-        setPaidOrders(result.paid_orders || []);
+        setPaidOrders(result.served_orders || []);
       } else {
         setError(result.msg || "Failed to fetch orders");
       }
@@ -366,7 +366,7 @@ function OrdersList() {
             {/* Paid Orders (previously Completed) */}
             <div className="col-4">
               <h4 className="display-5 text-white text-center fw-bold mb-3 mb-md-4 bg-success py-2 d-flex align-items-center justify-content-center rounded-4">
-                Paid
+                Served
               </h4>
               <div className="row g-3">
                 {renderOrders(paidOrders, 'success')}
