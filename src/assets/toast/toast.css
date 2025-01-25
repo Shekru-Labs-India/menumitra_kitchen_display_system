@@ -27,7 +27,7 @@
 .toast.error { border-left: 6px solid #f44336; }
 .toast.info { border-left: 6px solid #2196F3; }
 .toast.warning { border-left: 6px solid #ff9800; }
-
+.toast.notification { border-left: 6px solid #2196F3; }
 /* Toast Content Layout */
 .toast .toast-content {
   display: flex;
@@ -51,7 +51,7 @@
 .toast.error .toast-icon { background-color: #f44336; }
 .toast.info .toast-icon { background-color: #2196F3; }
 .toast.warning .toast-icon { background-color: #ff9800; }
-
+.toast.notification .toast-icon { background-color: #2196F3; }
 .toast-content .message {
   display: flex;
   flex-direction: column;
@@ -61,12 +61,14 @@
   font-size: 16px;
   font-weight: 600;
   color: #333;
+  text-transform: capitalize;
 }
 
 .message .text-body {
   font-size: 14px;
   font-weight: 400;
   color: #666;
+  text-transform: capitalize;
 }
 
 /* Close Button */
@@ -98,7 +100,7 @@
 .toast.error .progress-bar { background-color: #f44336; }
 .toast.info .progress-bar { background-color: #2196F3; }
 .toast.warning .progress-bar { background-color: #ff9800; }
-
+.toast.notification .progress-bar { background-color: #2196F3; }
 @keyframes progress {
   from { width: 100%; }
   to { width: 0%; }

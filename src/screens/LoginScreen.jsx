@@ -169,6 +169,7 @@ function LoginScreen() {
                           required
                           disabled={loading}
                           placeholder="Enter mobile number"
+                          autoFocus
                         />
                       </div>
                     </div>
@@ -212,6 +213,7 @@ function LoginScreen() {
                             onPaste={handlePaste}
                             maxLength="1"
                             required
+                         
                             disabled={loading}
                             autoComplete="off"
                             inputMode="numeric"

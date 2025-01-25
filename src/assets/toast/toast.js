@@ -13,23 +13,27 @@ function showToast(type, message) {
   let title;
   switch (type) {
     case "success":
-      icon = "✅"; // Success emoji
+      icon = '<i class="fas fa-check-circle"></i>'; // Success icon
       title = "Success";
       break;
     case "error":
-      icon = "❌"; // Error emoji
+      icon = '<i class="fas fa-times-circle"></i>'; // Error icon
       title = "Error";
       break;
     case "info":
-      icon = "ℹ️"; // Info emoji
+      icon = '<i class="fas fa-info-circle"></i>'; // Info icon
       title = "Info";
       break;
     case "warning":
-      icon = "⚠️"; // Warning emoji
+      icon = '<i class="fas fa-exclamation-triangle"></i>'; // Warning icon
       title = "Warning";
       break;
+    case "notification":
+      icon = '<i class="fas fa-bell"></i>'; // Default notification icon
+      title = "Notification";
+      break;
     default:
-      icon = "🔔"; // Default notification emoji
+      icon = '<i class="fas fa-bell"></i>'; // Default notification icon
       title = "Notification";
   }
 
@@ -43,7 +47,7 @@ function showToast(type, message) {
         <span class="text-body">${message}</span>
       </div>
     </div>
-    <i class="close" onclick="window.hideToast()">❌</i>
+    <i class="fas fa-times close" onclick="window.hideToast()"></i>
     <div class="progress-bar"></div>
   `;
 

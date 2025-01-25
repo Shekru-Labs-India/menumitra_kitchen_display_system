@@ -16,6 +16,7 @@ function Header() {
     localStorage.clear();
     // The Link component will handle the navigation to /login
   };
+  // window.showToast('notification', "Notification sent successfully:");
 
 
   const handleCallWaiter = async () => {
@@ -50,6 +51,7 @@ function Header() {
 };
 
 
+// window.showToast('notification', "FCM token not found!");
 
 const [fcmToken, setFcmToken] = useState(null);
 const BEARER_TOKEN = "ya29.a0AXeO80SFq8nJtSIvzwC2kSl5hxOnp8WNrXxLikOi-fYSCf27pzfQ4_GBxT-xzVeoIIsVnQmdTiNpxWa-mAFsO3YaDap0yfuENzM2SRe02crTSfkQV5ga9HTxEuU5zRznzxbX2KAFlrEmSPSQDON8MlvV5mLQYCHofvAJEghpaCgYKAbYSARESFQHGX2MiQo_N-7s-Tq58N9jy6mnCRw0175";
@@ -82,14 +84,32 @@ useEffect(() => {
       });
   }
 
-  const unsubscribe = onMessage(messaging, (payload) => {
-    window.showToast('Received foreground message:', payload);
-    new Notification(payload.notification.title, {
-      body: payload.notification.body,
-    });
-  });
+//   const unsubscribe = onMessage(messaging, (payload) => {
+//     window.showToast('Received foreground message:', payload);
+//     new Notification(payload.notification.title, {
+//       body: payload.notification.body,
+//     });
+//   });
 
-  return () => unsubscribe();
+//   return () => unsubscribe();
+// }, []);
+
+
+
+
+const unsubscribe = onMessage(messaging, (payload) => {
+  // Format the notification message for the toast
+  const notificationTitle = payload.notification.title;
+  const notificationBody = payload.notification.body;
+  window.showToast('notification', `${notificationTitle}: ${notificationBody}`);
+  
+  // Still show the native notification
+  new Notification(notificationTitle, {
+    body: notificationBody,
+  });
+});
+
+return () => unsubscribe();
 }, []);
 
 const sendTestNotification = async () => {
@@ -165,16 +185,7 @@ const sendTestNotification = async () => {
 
        
            
-              <div className="d-flex justify-content-left position-absolute start-50 translate-middle-x">
-            <button
-              className="btn btn-outline-primary"
-              onClick={sendTestNotification}
-            
-            >
-              <i className="bx bx-bell me-2"></i>
-              Test Notification
-            </button>
-          </div>
+
           {/* Call Waiter Button */}
           {/* <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
             <button
