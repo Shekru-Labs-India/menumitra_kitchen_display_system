@@ -10,7 +10,7 @@ export const authService = {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mobile: mobileNumber, role: "manager" }),
+          body: JSON.stringify({ mobile: mobileNumber, role: "chef" }),
         }
       );
       const result = await response.json();
