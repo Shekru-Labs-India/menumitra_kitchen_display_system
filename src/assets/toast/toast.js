@@ -11,6 +11,8 @@ function showToast(type, message) {
 
   let icon;
   let title;
+  let duration = 3000; // Default duration of 3 seconds
+
   switch (type) {
     case "success":
       icon = '<i class="fas fa-check-circle"></i>'; // Success icon
@@ -31,6 +33,7 @@ function showToast(type, message) {
     case "notification":
       icon = '<i class="fas fa-bell"></i>'; // Default notification icon
       title = "Notification";
+      duration = 5000; // Set duration to 10 seconds for notifications
       break;
     default:
       icon = '<i class="fas fa-bell"></i>'; // Default notification icon
@@ -54,10 +57,10 @@ function showToast(type, message) {
   // Show the toast
   toast.classList.add("show");
 
-  // Hide the toast after 3 seconds
+  // Hide the toast after the specified duration
   setTimeout(() => {
     toast.classList.remove("show");
-  }, 3000);
+  }, duration);
 }
 
 function hideToast() {

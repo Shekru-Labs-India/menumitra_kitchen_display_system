@@ -18,6 +18,7 @@ function Header() {
   };
   // window.showToast('notification', "Notification sent successfully:");
 
+  // window.showToast('notification', "gjkddghdghdfghdhdhgdh",100000);
 
   const handleCallWaiter = async () => {
     setLoading(true);
@@ -101,7 +102,7 @@ const unsubscribe = onMessage(messaging, (payload) => {
   // Format the notification message for the toast
   const notificationTitle = payload.notification.title;
   const notificationBody = payload.notification.body;
-  window.showToast('notification', `${notificationTitle}: ${notificationBody}`);
+  window.showToast('notification', `${notificationTitle}: ${notificationBody}`,10000);
   
   // Still show the native notification
   new Notification(notificationTitle, {
