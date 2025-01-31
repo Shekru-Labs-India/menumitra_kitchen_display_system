@@ -12,8 +12,10 @@ function Header() {
   const image = localStorage.getItem("image");
     const [isImageError, setIsImageError] = useState(false);
     const authData = JSON.parse(localStorage.getItem("authData"));
-    const outletName = authData?.outlet_name; // Get 
+    // const outletName = authData?.outlet_name; // Get 
     const userId = authData?.user_id; // Get 
+    const outletName = localStorage.getItem("outlet_name");
+
     const navigate = useNavigate();
     const handleLogout = async () => {
       try {
@@ -43,6 +45,7 @@ function Header() {
           // Redirect to login page
          navigate("/login")
         } else {
+          localStorage.clear();
         }
       } catch (error) {
         console.error("Error logging out:", error);

@@ -198,20 +198,44 @@ function OrdersList() {
     return orderDate;
   };
 
+
+
   const CircularCountdown = ({ orderId, order }) => {
     const [timeLeft, setTimeLeft] = useState(90);
     const [isExpired, setIsExpired] = useState(false);
     const timerRef = useRef(null);
-
+  
+    const parseOrderDate = (dateTimeStr) => {
+      // Format: "31-Jan-2025 06:21:17 PM"
+      const [datePart, timePart, modifier] = dateTimeStr.split(' ');
+      const [day, month, year] = datePart.split('-');
+      const [hours, minutes, seconds] = timePart.split(':');
+  
+      const months = {
+        Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+        Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+      };
+  
+      const parsedDate = new Date(
+        year, 
+        months[month], 
+        parseInt(day, 10),
+        modifier === 'PM' ? parseInt(hours, 10) + 12 : parseInt(hours, 10), 
+        parseInt(minutes, 10), 
+        parseInt(seconds, 10)
+      );
+  
+      return parsedDate;
+    };
+  
     const handleRejectOrder = async () => {
-      const accessToken = localStorage.getItem("access"); // Retrieve the access token
-    
+      const accessToken = localStorage.getItem("access");
       if (!accessToken) {
         console.error("No access token found");
-        window.location.href = "/login"; // Redirect to login page if no token
+        window.location.href = "/login";
         return;
       }
-    
+  
       try {
         const response = await fetch(
           "https://men4u.xyz/common_api/update_order_status",
@@ -219,7 +243,7 @@ function OrdersList() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
+              "Authorization": `Bearer ${accessToken}`,
             },
             body: JSON.stringify({
               outlet_id: localStorage.getItem("outlet_id"),
@@ -229,17 +253,17 @@ function OrdersList() {
             }),
           }
         );
-    
+  
         if (response.status === 401) {
           console.error("Unauthorized access - redirecting to login");
-          window.location.href = "/login"; // Redirect to login if 401
+          window.location.href = "/login";
           return;
         }
-    
+  
         const result = await response.json();
         if (result.st === 1) {
           alert(result.msg);
-          fetchOrders(); // Refresh orders after successful cancellation
+          fetchOrders();
         } else {
           alert(result.msg || "Failed to cancel order");
         }
@@ -248,22 +272,20 @@ function OrdersList() {
         alert("Error cancelling order");
       }
     };
-    
-
+  
     useEffect(() => {
-      const orderDate = getOrderTimeWithSeconds(order?.date_time);
+      const orderDate = parseOrderDate(order?.date_time);
       if (!orderDate) {
         setIsExpired(true);
         return;
       }
-
-      // Add 90 seconds to the order time
+  
       const expiryTime = new Date(orderDate.getTime() + (90 * 1000));
-
+  
       const calculateTimeLeft = () => {
         const now = new Date().getTime();
         const remaining = Math.max(Math.floor((expiryTime - now) / 1000), 0);
-
+  
         if (remaining === 0) {
           setIsExpired(true);
           clearInterval(timerRef.current);
@@ -271,37 +293,37 @@ function OrdersList() {
         }
         setTimeLeft(remaining);
       };
-
+  
       calculateTimeLeft();
       timerRef.current = setInterval(calculateTimeLeft, 1000);
-
+  
       return () => {
         if (timerRef.current) {
           clearInterval(timerRef.current);
         }
       };
     }, [orderId, order?.date_time]);
-
+  
     if (isExpired) return null;
-
+  
     const percentage = (timeLeft / 90) * 100;
-
+  
     return (
       <div className="d-flex align-items-center gap-2">
         <div className="circular-countdown">
           <svg viewBox="0 0 36 36" className="circular-timer">
             <path
               d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
+                 a 15.9155 15.9155 0 0 1 0 31.831
+                 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
               stroke="#eee"
               strokeWidth="3"
             />
             <path
               d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
+                 a 15.9155 15.9155 0 0 1 0 31.831
+                 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
               stroke="#2196f3"
               strokeWidth="3"
@@ -310,15 +332,13 @@ function OrdersList() {
           </svg>
           <div className="timer-text-overlay text-dark">{timeLeft}s</div>
         </div>
-        <button
-          className="btn btn-danger btn-sm"
-          onClick={handleRejectOrder}
-        >
+        <button className="btn btn-danger btn-sm" onClick={handleRejectOrder}>
           Reject
         </button>
       </div>
     );
   };
+  
 
   const renderOrders = (orders, type) => {
     if (!Array.isArray(orders)) return null;
