@@ -66,18 +66,35 @@ function OrdersList() {
   }, [navigate]);
 
   const fetchOrders = async () => {
+    const accessToken = localStorage.getItem("access"); // Retrieve the access token
+  
+    if (!accessToken) {
+      console.error("No access token found");
+      window.location.href = "/login"; // Redirect to login page if no token
+      return;
+    }
+  
     try {
       const response = await fetch(
         "https://men4u.xyz/common_api/cds_kds_order_listview",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
+          },
           body: JSON.stringify({ outlet_id: outletId }),
         }
       );
-
+  
+      if (response.status === 401) {
+        console.error("Unauthorized access - redirecting to login");
+        window.location.href = "/login"; // Redirect to login if 401
+        return;
+      }
+  
       const result = await response.json();
-      
+  
       if (result.st === 1) {
         // Compare new orders with existing ones and store current menu items
         result.cooking_orders?.forEach(newOrder => {
@@ -90,7 +107,7 @@ function OrdersList() {
             }));
           }
         });
-
+  
         setPlacedOrders(result.placed_orders || []);
         setCookingOrders(result.cooking_orders || []);
         setPaidOrders(result.served_orders || []);
@@ -104,14 +121,25 @@ function OrdersList() {
       setLoading(false);
     }
   };
-
+  
   const updateOrderStatus = async (orderId) => {
+    const accessToken = localStorage.getItem("access"); // Retrieve the access token
+  
+    if (!accessToken) {
+      console.error("No access token found");
+      window.location.href = "/login"; // Redirect to login page if no token
+      return;
+    }
+  
     try {
       const response = await fetch(
         "https://men4u.xyz/common_api/update_order_status",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
+          },
           body: JSON.stringify({
             outlet_id: outletId,
             order_id: orderId,
@@ -120,9 +148,15 @@ function OrdersList() {
           }),
         }
       );
-
+  
+      if (response.status === 401) {
+        console.error("Unauthorized access - redirecting to login");
+        window.location.href = "/login"; // Redirect to login if 401
+        return;
+      }
+  
       const result = await response.json();
-
+  
       if (result.st === 1) {
         alert(result.msg);
         fetchOrders(); // Refresh orders after successful update
@@ -134,6 +168,7 @@ function OrdersList() {
       alert("Error updating order status");
     }
   };
+  
 
   const getOrderTimeWithSeconds = (timeStr) => {
     if (!timeStr) return null;
@@ -169,12 +204,23 @@ function OrdersList() {
     const timerRef = useRef(null);
 
     const handleRejectOrder = async () => {
+      const accessToken = localStorage.getItem("access"); // Retrieve the access token
+    
+      if (!accessToken) {
+        console.error("No access token found");
+        window.location.href = "/login"; // Redirect to login page if no token
+        return;
+      }
+    
       try {
         const response = await fetch(
           "https://men4u.xyz/common_api/update_order_status",
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
+            },
             body: JSON.stringify({
               outlet_id: localStorage.getItem("outlet_id"),
               order_id: orderId,
@@ -183,11 +229,17 @@ function OrdersList() {
             }),
           }
         );
-
+    
+        if (response.status === 401) {
+          console.error("Unauthorized access - redirecting to login");
+          window.location.href = "/login"; // Redirect to login if 401
+          return;
+        }
+    
         const result = await response.json();
         if (result.st === 1) {
           alert(result.msg);
-          fetchOrders();
+          fetchOrders(); // Refresh orders after successful cancellation
         } else {
           alert(result.msg || "Failed to cancel order");
         }
@@ -196,6 +248,7 @@ function OrdersList() {
         alert("Error cancelling order");
       }
     };
+    
 
     useEffect(() => {
       const orderDate = getOrderTimeWithSeconds(order?.date_time);

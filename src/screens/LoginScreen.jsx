@@ -74,7 +74,9 @@ function LoginScreen() {
         localStorage.setItem("outlet_name", response.outlet_name);
         localStorage.setItem("image", response.image);
         localStorage.setItem("fcmToken", fcmToken); // Store FCM token
-        
+         
+        localStorage.setItem("access", response.access); // Store FCM token
+
      
         navigate("/orders");
       } else {
