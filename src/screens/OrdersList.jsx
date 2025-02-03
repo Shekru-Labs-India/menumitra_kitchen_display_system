@@ -205,28 +205,80 @@ function OrdersList() {
     const [isExpired, setIsExpired] = useState(false);
     const timerRef = useRef(null);
   
-    const parseOrderDate = (dateTimeStr) => {
-      // Format: "31-Jan-2025 06:21:17 PM"
-      const [datePart, timePart, modifier] = dateTimeStr.split(' ');
-      const [day, month, year] = datePart.split('-');
-      const [hours, minutes, seconds] = timePart.split(':');
+    useEffect(() => {
+      console.log('Order datetime:', order?.date_time);
   
-      const months = {
-        Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-        Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+      if (!order?.date_time) {
+        setIsExpired(true);
+        return;
+      }
+  
+      try {
+        // Format: "03 Feb 2025 06:23:05 PM"
+        const [day, month, year, time, period] = order.date_time.split(' ');
+        const [hours, minutes, seconds] = time.split(':');
+        
+        // Convert hours to 24-hour format
+        let hrs = parseInt(hours);
+        if (period === 'PM' && hrs !== 12) hrs += 12;
+        if (period === 'AM' && hrs === 12) hrs = 0;
+
+        const months = {
+          'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+          'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
+        };
+
+        const orderDate = new Date(
+          parseInt(year),
+          months[month],
+          parseInt(day),
+          hrs,
+          parseInt(minutes),
+          parseInt(seconds)
+        );
+
+        console.log('Parsed order date:', orderDate);
+  
+        // Add 90 seconds to order time for expiry
+        const expiryTime = orderDate.getTime() + (90 * 1000);
+        const now = new Date().getTime();
+
+        // If the order is less than 90 seconds old, start the countdown
+        if (expiryTime > now) {
+          const calculateTimeLeft = () => {
+            const currentTime = new Date().getTime();
+            const remaining = Math.max(Math.floor((expiryTime - currentTime) / 1000), 0);
+            console.log('Remaining time:', remaining);
+
+            if (remaining <= 0) {
+              setIsExpired(true);
+              clearInterval(timerRef.current);
+              return;
+            }
+            setTimeLeft(remaining);
+          };
+
+          calculateTimeLeft();
+          timerRef.current = setInterval(calculateTimeLeft, 1000);
+        } else {
+          setIsExpired(true);
+        }
+  
+      } catch (error) {
+        console.error('Error in countdown:', error);
+        setIsExpired(true);
+      }
+  
+      return () => {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
       };
+    }, [orderId, order?.date_time]);
   
-      const parsedDate = new Date(
-        year, 
-        months[month], 
-        parseInt(day, 10),
-        modifier === 'PM' ? parseInt(hours, 10) + 12 : parseInt(hours, 10), 
-        parseInt(minutes, 10), 
-        parseInt(seconds, 10)
-      );
+    if (isExpired) return null;
   
-      return parsedDate;
-    };
+    const percentage = (timeLeft / 90) * 100;
   
     const handleRejectOrder = async () => {
       const accessToken = localStorage.getItem("access");
@@ -273,41 +325,6 @@ function OrdersList() {
       }
     };
   
-    useEffect(() => {
-      const orderDate = parseOrderDate(order?.date_time);
-      if (!orderDate) {
-        setIsExpired(true);
-        return;
-      }
-  
-      const expiryTime = new Date(orderDate.getTime() + (90 * 1000));
-  
-      const calculateTimeLeft = () => {
-        const now = new Date().getTime();
-        const remaining = Math.max(Math.floor((expiryTime - now) / 1000), 0);
-  
-        if (remaining === 0) {
-          setIsExpired(true);
-          clearInterval(timerRef.current);
-          return;
-        }
-        setTimeLeft(remaining);
-      };
-  
-      calculateTimeLeft();
-      timerRef.current = setInterval(calculateTimeLeft, 1000);
-  
-      return () => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
-      };
-    }, [orderId, order?.date_time]);
-  
-    if (isExpired) return null;
-  
-    const percentage = (timeLeft / 90) * 100;
-  
     return (
       <div className="d-flex align-items-center gap-2">
         <div className="circular-countdown">
@@ -345,11 +362,12 @@ function OrdersList() {
 
     return orders.map((order) => {
       const prevMenuItems = previousMenuItems[order.order_id] || [];
+      const cssType = type === 'placed' ? 'secondary' : type;
 
       return (
         <div className="col-12" key={order.order_id}>
           <div className="card bg-white rounded-3">
-            <div className={`card-header bg-${type} bg-opacity-10 py-2`}>
+            <div className={`card-header bg-${cssType} bg-opacity-10 py-2`}>
               <div className="d-flex justify-content-between align-items-center">
                 <p className="fs-3 fw-bold mb-0">
                   <i className="bx bx-hash"></i> {order.order_number}
@@ -366,7 +384,7 @@ function OrdersList() {
                 const isNewItem = prevMenuItems.length > 0 && !prevMenuItems.includes(menu.menu_name);
                 return (
                   <div
-                    className={`d-flex justify-content-between align-items-center border-start border-${type} border-3 ps-2 mb-2`}
+                    className={`d-flex justify-content-between align-items-center border-start border-${cssType} border-3 ps-2 mb-2`}
                     key={index}
                   >
                     <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
@@ -377,9 +395,6 @@ function OrdersList() {
                     </div>
                     <div className="d-flex align-items-center text-end gap-2">
                       <span>× {menu.quantity}</span>
-                      {type === 'secondary' && index === 0 && (
-                        <span className="text-muted">{order.timeLeft}</span>
-                      )}
                     </div>
                   </div>
                 );
@@ -392,7 +407,8 @@ function OrdersList() {
                   Complete Order
                 </button>
               )}
-              {type === 'secondary' && (
+              {/* Show countdown timer for orders with 'placed' status */}
+              {order.order_status === 'placed' && (
                 <div className="d-flex justify-content-end mt-2">
                   <CircularCountdown orderId={order.order_id} order={order} />
                 </div>
