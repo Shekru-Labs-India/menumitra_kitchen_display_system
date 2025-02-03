@@ -6,7 +6,7 @@ export const authService = {
   sendOTP: async (mobileNumber) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/user_login",
+        "https://menusmitra.xyz/common_api/user_login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,7 +42,7 @@ export const authService = {
     
       try {
         const response = await fetch(
-          "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
+          "https://menusmitra.xyz/kitchen_display_system_api/kds_verify_otp",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

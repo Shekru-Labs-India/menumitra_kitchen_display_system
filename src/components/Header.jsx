@@ -29,7 +29,7 @@ function Header() {
         };
     
         // Make API request to logout using fetch
-        const response = await fetch("https://men4u.xyz/common_api/logout", {
+        const response = await fetch("https://menusmitra.xyz/common_api/logout", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -66,7 +66,7 @@ function Header() {
     console.log('User ID:', user_id);
 
     try {
-        const response = await axios.post('https://men4u.xyz/common_api/call_waiter', {
+        const response = await axios.post('https://menusmitra.xyz/common_api/call_waiter', {
             outlet_id: parseInt(outlet_id),
             user_id: parseInt(user_id),
         });

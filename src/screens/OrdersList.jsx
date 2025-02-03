@@ -76,7 +76,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/cds_kds_order_listview",
+        "https://menusmitra.xyz/common_api/cds_kds_order_listview",
         {
           method: "POST",
           headers: {
@@ -133,7 +133,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/update_order_status",
+        "https://menusmitra.xyz/common_api/update_order_status",
         {
           method: "POST",
           headers: {
@@ -238,7 +238,7 @@ function OrdersList() {
   
       try {
         const response = await fetch(
-          "https://men4u.xyz/common_api/update_order_status",
+          "https://menusmitra.xyz/common_api/update_order_status",
           {
             method: "POST",
             headers: {
