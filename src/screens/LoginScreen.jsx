@@ -223,9 +223,7 @@ function LoginScreen() {
                           />
                         ))}
                       </div>
-                      <div className="form-text text-center mt-2">
-                        Default OTP: 1234
-                      </div>
+                      
                     </div>
                     <button
                       type="submit"

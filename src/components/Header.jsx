@@ -64,15 +64,24 @@ function Header() {
 
     console.log('Outlet ID:', outlet_id);
     console.log('User ID:', user_id);
-
+    const accessToken = localStorage.getItem("access"); // Retrieve the access token
+  
+    if (!accessToken) {
+      console.error("No access token found");
+      window.location.href = "/login"; // Redirect to login page if no token
+      return;
+    }
     try {
         const response = await axios.post('https://menusmitra.xyz/common_api/call_waiter', {
-            outlet_id: parseInt(outlet_id),
-            user_id: parseInt(user_id),
-        });
-
+          outlet_id: parseInt(outlet_id),
+          user_id: parseInt(user_id),
+      }, {
+          headers: {
+              Authorization: `Bearer ${accessToken}`,
+          },
+      });
         if (response.data.st === 1) {
-            window.showToast?.('success', 'Waiter has been called successfully');
+            window.showToast?.('success', 'Waiter has been called ');
         } else {
             window.showToast?.('error', response.data.msg || 'Failed to call the waiter');
         }
@@ -224,7 +233,7 @@ const sendTestNotification = async () => {
            
 
           {/* Call Waiter Button */}
-          {/* <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
+           <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
             <button
               className="btn btn-outline-primary"
             onClick={handleCallWaiter}
@@ -233,7 +242,7 @@ const sendTestNotification = async () => {
               <i className="bx bx-bell me-2"></i>
               Call Waiter
             </button>
-          </div> */}
+          </div> 
 
           {/* Logout Button - Always Visible */}
           <div className="d-flex align-items-center">
