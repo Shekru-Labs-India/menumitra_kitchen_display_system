@@ -10,52 +10,45 @@ function Footer() {
               © Copyright. All Rights Reserved.
             </div>
             <div className="text-center d-flex justify-content-center">
-              <a
-                href="https://www.google.com/search?q=Menu+Mitra"
-                className="footer-link mx-3"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bx bxl-google bx-sm text-muted"></i>
-              </a>
-              <a
-                href="https://www.facebook.com/people/Menu-Mitra/61565082412478/"
-                className="footer-link mx-3"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bx bxl-facebook bx-sm text-muted"></i>
-              </a>
-              <a
-                href="https://www.instagram.com/menumitra/"
-                className="footer-link mx-3"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bx bxl-instagram bx-sm text-muted"></i>
-              </a>
-              <a
-                href="https://www.youtube.com/@menumitra"
-                className="footer-link mx-3"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bx bxl-youtube bx-sm text-muted"></i>
-              </a>
-              <a
-                href="https://x.com/MenuMitra"
-                className="footer-link mx-3"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="bx bxl-twitter bx-sm text-muted"></i>
-              </a>
-            </div>
+  <a
+    href="https://www.facebook.com/people/Menu-Mitra/61565082412478/"
+    className="footer-link mx-3"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i className="bx bxl-facebook bx-sm" style={{ color: '#1877f2' }}></i> {/* Facebook Blue */}
+  </a>
+  <a
+    href="https://www.instagram.com/menumitra/"
+    className="footer-link mx-3"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i className="bx bxl-instagram bx-sm" style={{ color: '#E4405F' }}></i> {/* Instagram Pink */}
+  </a>
+  <a
+    href="https://www.youtube.com/@menumitra"
+    className="footer-link mx-3"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i className="bx bxl-youtube bx-sm" style={{ color: '#FF0000' }}></i> {/* YouTube Red */}
+  </a>
+  <a
+    href="https://x.com/i/flow/login?redirect_after_login=%2FMenuMitra"
+    className="footer-link mx-3"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <i className="bx bxl-twitter bx-sm" style={{ color: '#1DA1F2' }}></i> {/* Twitter Blue */}
+  </a>
+</div>
+
             <div className="d-flex justify-content-center align-items-center mt-3 mt-md-0">
               <i class="bx bxs-bolt fs-6 me-2"></i>
               Powered by
               <a
-                className="ps-2"
+                className="ps-2 text-success "
                 href="https://www.shekruweb.com/"
                 target="_blank"
                 rel="noopener noreferrer"

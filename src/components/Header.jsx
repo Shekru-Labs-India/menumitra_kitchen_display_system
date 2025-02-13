@@ -199,7 +199,7 @@ const sendTestNotification = async () => {
         <div className="container-fluid px-5">
           {/* Brand/Logo */}
           {!isImageError && image ? (
-  <Link to="/" className="navbar-brand d-flex align-items-center">
+  <div className="navbar-brand d-flex align-items-center">
     <img
       src={image}
       alt="Hotel Logo"
@@ -208,9 +208,9 @@ const sendTestNotification = async () => {
       onError={() => setIsImageError(true)} 
     />
     <span className="fs-4 fw-bold">{outletName?.toUpperCase()}</span>
-  </Link>
+  </div>
 ) : (
-  <Link to="/" className="navbar-brand d-flex align-items-center">
+  <div  className="navbar-brand d-flex align-items-center">
     <div
       className="me-2 d-flex justify-content-center align-items-center rounded-circle"
       style={{
@@ -224,7 +224,7 @@ const sendTestNotification = async () => {
       {outletName?.[0]?.toUpperCase() || "H"}
     </div>
     <span className="fs-4 fw-bold">{outletName?.toUpperCase() || "HOTEL"}</span>
-  </Link>
+  </div>
 )}
 
       
