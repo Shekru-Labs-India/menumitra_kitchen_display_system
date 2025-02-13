@@ -13,9 +13,9 @@ function Header() {
     const [isImageError, setIsImageError] = useState(false);
     const authData = JSON.parse(localStorage.getItem("authData"));
     // const outletName = authData?.outlet_name; // Get 
-    const userId = authData?.user_id; // Get 
+    // const userId = authData?.user_id; // Get 
     const outletName = localStorage.getItem("outlet_name");
-
+const userId = localStorage.getItem("user_id");
     const navigate = useNavigate();
     const handleLogout = async () => {
       try {
