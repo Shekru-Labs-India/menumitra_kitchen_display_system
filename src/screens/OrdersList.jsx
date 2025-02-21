@@ -76,7 +76,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://menusmitra.xyz/common_api/cds_kds_order_listview",
+        "https://men4u.xyz/common_api/cds_kds_order_listview",
         {
           method: "POST",
           headers: {
@@ -133,7 +133,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://menusmitra.xyz/common_api/update_order_status",
+        "https://men4u.xyz/common_api/update_order_status",
         {
           method: "POST",
           headers: {
@@ -290,7 +290,7 @@ function OrdersList() {
   
       try {
         const response = await fetch(
-          "https://menusmitra.xyz/common_api/update_order_status",
+          "https://men4u.xyz/common_api/update_order_status",
           {
             method: "POST",
             headers: {
@@ -384,19 +384,28 @@ function OrdersList() {
                 const isNewItem = prevMenuItems.length > 0 && !prevMenuItems.includes(menu.menu_name);
                 return (
                   <div
-                    className={`d-flex justify-content-between align-items-center border-start border-${cssType} border-3 ps-2 mb-2`}
-                    key={index}
-                  >
-                    <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
-                      {menu.menu_name}
-                    </div>
-                    <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
-                      {menu.half_or_full}
-                    </div>
-                    <div className="d-flex align-items-center text-end gap-2">
-                      <span>× {menu.quantity}</span>
-                    </div>
+                  className={`d-flex flex-wrap justify-content-between align-items-center border-start border-${cssType} border-3 ps-2 mb-2`}
+                  key={index}
+                >
+                  <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
+                    {menu.menu_name}
                   </div>
+                  <div className={`fw-semibold text-capitalize ${isNewItem ? 'text-danger' : ''}`}>
+                    {menu.half_or_full}
+                  </div>
+                  <div className="d-flex align-items-center text-end gap-2">
+                    <span>× {menu.quantity}</span>
+                  </div>
+                
+                  {/* Comment on a new row */}
+                  {menu.comment && (
+                    <div className="w-100 text-start text-muted "style={{ fontSize: '0.75rem' }} > 
+                      <span>{menu.comment}</span>
+                    </div>
+                  )}
+                </div>
+                
+                  
                 );
               })}
               {type === 'warning' && (
