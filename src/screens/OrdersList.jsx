@@ -305,6 +305,7 @@ function OrdersList() {
               order_id: orderId,
               order_status: "cancelled",
               user_id: localStorage.getItem("user_id"),
+              device_token: "8RTudo2zku0MvVQklvs7sMNcroVw4oDSK9LcXqLS04iXkuJAufKZ0tWX9CSjWfxfT.a0y5tEPriR5Je9cdQRTSBCmyVRzQ6TTofe",
             }),
           }
         );
