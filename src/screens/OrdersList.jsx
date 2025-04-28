@@ -124,11 +124,11 @@ function OrdersList() {
   };
   
   const updateOrderStatus = async (orderId) => {
-    const accessToken = localStorage.getItem("access"); // Retrieve the access token
+    const accessToken = localStorage.getItem("access");
   
     if (!accessToken) {
       console.error("No access token found");
-      window.location.href = "/login"; // Redirect to login page if no token
+      alert("Please login to continue");
       return;
     }
   
@@ -139,25 +139,26 @@ function OrdersList() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
+            "Authorization": `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             outlet_id: outletId,
             order_id: orderId,
-            order_status: "served",
+            order_status: "served", // Only update to served status
             user_id: userId,
+            device_token: "RxanKS.nzaWZeXi8rIKQoArTQDJAurdDYuh9tVKEeNpi0HYYQGBnpXBodDrpBwOu.o1B8fBlj7htIPOBllOPK4gZJ7LThf17OoKh",
           }),
         }
       );
   
       if (response.status === 401) {
-        console.error("Unauthorized access - redirecting to login");
-        window.location.href = "/login"; // Redirect to login if 401
+        console.error("Unauthorized access - token invalid or expired");
+        alert("Session expired. Please log in again.");
         return;
       }
   
       const result = await response.json();
-  
+      
       if (result.st === 1) {
         alert(result.msg);
         fetchOrders(); // Refresh orders after successful update
@@ -169,6 +170,7 @@ function OrdersList() {
       alert("Error updating order status");
     }
   };
+  
   
 
   const getOrderTimeWithSeconds = (timeStr) => {
