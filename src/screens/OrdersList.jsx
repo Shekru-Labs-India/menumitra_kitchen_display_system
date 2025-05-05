@@ -125,6 +125,8 @@ function OrdersList() {
   
   const updateOrderStatus = async (orderId) => {
     const accessToken = localStorage.getItem("access");
+    // Use the same device token as fetchOrders function
+    const device_token = "8RTudo2zku0MvVQklvs7sMNcroVw4oDSK9LcXqLS04iXkuJAufKZ0tWX9CSjWfxfT.a0y5tEPriR5Je9cdQRTSBCmyVRzQ6TTofe";
   
     if (!accessToken) {
       console.error("No access token found");
@@ -144,30 +146,71 @@ function OrdersList() {
           body: JSON.stringify({
             outlet_id: outletId,
             order_id: orderId,
-            order_status: "served", // Only update to served status
+            order_status: "served",
             user_id: userId,
-            device_token: "RxanKS.nzaWZeXi8rIKQoArTQDJAurdDYuh9tVKEeNpi0HYYQGBnpXBodDrpBwOu.o1B8fBlj7htIPOBllOPK4gZJ7LThf17OoKh",
+            device_token: device_token
           }),
         }
       );
   
-      if (response.status === 401) {
-        console.error("Unauthorized access - token invalid or expired");
-        alert("Session expired. Please log in again.");
-        return;
+      // Check if response is ok before parsing
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Try refreshing token or handle expired session
+          const refreshResult = await refreshToken();
+          if (refreshResult) {
+            // Retry the update with new token
+            return updateOrderStatus(orderId);
+          }
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
   
       const result = await response.json();
       
       if (result.st === 1) {
-        alert(result.msg);
         fetchOrders(); // Refresh orders after successful update
+        alert("Order successfully updated to served");
+      } else if (result.st === 5) {
+        // Try to refresh orders to get new device token
+        console.error("Device token error:", result.msg);
+        await fetchOrders(); // Get fresh device token
+        alert("Retrying with updated device token...");
+        return updateOrderStatus(orderId); // Retry the update
       } else {
         alert(result.msg || "Failed to update order status");
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      alert("Error updating order status");
+      alert("Error updating order status. Please try again.");
+    }
+  };
+  
+  // Add this helper function to refresh the token
+  const refreshToken = async () => {
+    const refresh = localStorage.getItem("refresh");
+    if (!refresh) return false;
+  
+    try {
+      const response = await fetch("https://men4u.xyz/common_api/token/refresh", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refresh: refresh,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("access", data.access);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      return false;
     }
   };
   
