@@ -59,16 +59,15 @@ function LoginScreen() {
           setShowOtp(true);
         } else {
           setError(
-            "Access denied. Only chef role is allowed to use this application."
+            "Access denied for this role."
           );
         }
       } else {
         if (result.isMaxSessionsError) {
           setError(
-            <div>
-              <p className="mb-2">Maximum active sessions reached.</p>
+            <div className="text-center text-danger mt-2">
               <p className="mb-0">
-                Please logout from other devices before trying again.
+                Maximum active sessions reached. Please logout from other devices before trying again.
               </p>
             </div>
           );
@@ -194,20 +193,6 @@ function LoginScreen() {
           <p className="text-muted">Kitchen Display System</p>
         </div>
 
-        {error && (
-          <div
-            className="alert alert-danger alert-dismissible fade show"
-            role="alert"
-          >
-            {error}
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setError("")}
-            ></button>
-          </div>
-        )}
-
         {!showOtp ? (
           <form onSubmit={handleMobileSubmit}>
             <div className="mb-4">
@@ -221,7 +206,9 @@ function LoginScreen() {
                 <span className="input-group-text bg-white">+91</span>
                 <input
                   type="tel"
-                  className="fs-5 border border-gray form-control-lg"
+                  className={`fs-5 border form-control-lg ${
+                    error ? "input-error" : "border-gray"
+                  }`}
                   id="mobile"
                   value={mobileNumber}
                   onChange={handleMobileNumberChange}
@@ -234,6 +221,7 @@ function LoginScreen() {
                   pattern="[0-9]*"
                 />
               </div>
+              <div className="error-message">{error}</div>
             </div>
             <button
               type="submit"
