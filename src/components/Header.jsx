@@ -237,7 +237,7 @@ const sendTestNotification = async () => {
            
 
           {/* Call Waiter Button */}
-           <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
+          {/* <div className="d-flex justify-content-center position-absolute start-50 translate-middle-x">
             <button
               className="btn btn-outline-primary"
             onClick={handleCallWaiter}
@@ -246,7 +246,7 @@ const sendTestNotification = async () => {
               <i className="bx bx-bell me-2"></i>
               Call Waiter
             </button>
-          </div> 
+          </div>  */}
 
           {/* Logout Button - Always Visible */}
           <div className="d-flex align-items-center">

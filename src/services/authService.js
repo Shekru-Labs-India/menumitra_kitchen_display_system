@@ -12,9 +12,21 @@ export const authService = {
       });
       const result = await response.json();
       if (result.st === 1) {
-        return { success: true, message: result.msg };
+        return { success: true, message: result.msg, role: result.role };
       } else {
-        return { success: false, error: "Failed to send OTP" };
+        // Check for maximum sessions error
+        if (
+          result.msg &&
+          result.msg.toLowerCase().includes("maximum active sessions")
+        ) {
+          return {
+            success: false,
+            error:
+              "Maximum active sessions reached. Please logout from other devices.",
+            isMaxSessionsError: true,
+          };
+        }
+        return { success: false, error: result.msg || "Failed to send OTP" };
       }
     } catch (error) {
       console.error("OTP Send Error:", error);

@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import "./LoginScreen.css";
-import { messaging } from '../firebase-config';
-import { getToken } from 'firebase/messaging';
-import { VAPID_KEY } from '../config';
-import logo from "../assets/logo.png"; 
+import { messaging } from "../firebase-config";
+import { getToken } from "firebase/messaging";
+import { VAPID_KEY } from "../config";
+import logo from "../assets/logo.png";
 
 function LoginScreen() {
   const [mobileNumber, setMobileNumber] = useState("");
@@ -38,6 +38,13 @@ function LoginScreen() {
     setError("");
     setLoading(true);
 
+    // Check for exactly 10 digits
+    if (!/^\d{10}$/.test(mobileNumber)) {
+      setError("Please enter a valid 10-digit mobile number.");
+      setLoading(false);
+      return;
+    }
+
     // Check if the first digit is between 0 and 5
     if (/^[0-5]/.test(mobileNumber)) {
       setError("Mobile number cannot start with digits between 0 and 5.");
@@ -48,9 +55,26 @@ function LoginScreen() {
     try {
       const result = await authService.sendOTP(mobileNumber);
       if (result.success) {
-        setShowOtp(true);
+        if (result.role === "chef") {
+          setShowOtp(true);
+        } else {
+          setError(
+            "Access denied. Only chef role is allowed to use this application."
+          );
+        }
       } else {
-        setError(result.error || "Invalid mobile number");
+        if (result.isMaxSessionsError) {
+          setError(
+            <div>
+              <p className="mb-2">Maximum active sessions reached.</p>
+              <p className="mb-0">
+                Please logout from other devices before trying again.
+              </p>
+            </div>
+          );
+        } else {
+          setError(result.error || "Invalid mobile number");
+        }
       }
     } catch (err) {
       setError("Failed to send OTP");
@@ -72,7 +96,11 @@ function LoginScreen() {
       }
 
       const combinedOtp = otpValues.join("");
-      const response = await authService.verifyOTP(mobileNumber, combinedOtp, fcmToken);
+      const response = await authService.verifyOTP(
+        mobileNumber,
+        combinedOtp,
+        fcmToken
+      );
 
       if (response.st === 1) {
         localStorage.setItem("user_id", response.user_id);
@@ -128,11 +156,11 @@ function LoginScreen() {
 
   // Handle mobile number input change and restrict starting from 0-5
   const handleMobileNumberChange = (e) => {
-    const newMobileNumber = e.target.value;
+    const newMobileNumber = e.target.value.replace(/\D/g, "").slice(0, 10);
 
     // Check if the first digit is between 0 and 5
     if (/^[0-5]/.test(newMobileNumber)) {
-      // setError("Mobile number cannot start with digits between 0 and 5.");
+      setError("Mobile number cannot start with digits between 0 and 5.");
     } else {
       setError(""); // Clear the error if valid
     }
@@ -167,35 +195,49 @@ function LoginScreen() {
         </div>
 
         {error && (
-          <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          <div
+            className="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
             {error}
-            <button type="button" className="btn-close" onClick={() => setError("")}></button>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError("")}
+            ></button>
           </div>
         )}
 
         {!showOtp ? (
           <form onSubmit={handleMobileSubmit}>
             <div className="mb-4">
-              <label htmlFor="mobile" className="form-label text-muted fw-bold small">Mobile Number</label>
+              <label
+                htmlFor="mobile"
+                className="form-label text-muted fw-bold small"
+              >
+                Mobile Number
+              </label>
               <div className="input-group">
                 <span className="input-group-text bg-white">+91</span>
                 <input
-                  type="number"
-                  className=" fs-5 border border-gray form-control-lg"
+                  type="tel"
+                  className="fs-5 border border-gray form-control-lg"
                   id="mobile"
                   value={mobileNumber}
-                  onChange={handleMobileNumberChange} // Use the new handler
+                  onChange={handleMobileNumberChange}
                   maxLength="10"
                   required
                   disabled={loading}
                   placeholder="Enter mobile number"
                   autoFocus
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                 />
               </div>
             </div>
-            <button 
-              type="submit" 
-              className="btn btn-primary btn-lg w-100" 
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg w-100"
               disabled={loading || !isMobileNumberValid(mobileNumber)}
             >
               {loading ? "Sending OTP..." : "Send OTP"}
@@ -204,7 +246,12 @@ function LoginScreen() {
         ) : (
           <form onSubmit={handleVerifyOTP}>
             <div className="mb-4">
-              <label htmlFor="otp-1" className="form-label text-center text-muted fw-bold small">Enter OTP</label>
+              <label
+                htmlFor="otp-1"
+                className="form-label text-center text-muted fw-bold small"
+              >
+                Enter OTP
+              </label>
               <div className="d-flex gap-5 justify-content-center">
                 {[0, 1, 2, 3].map((index) => (
                   <input
@@ -213,7 +260,9 @@ function LoginScreen() {
                     type="text"
                     className="border border-gray form-control-lg text-center fw-bold otp-input"
                     value={otpValues[index]}
-                    onChange={(e) => handleOtpChange(index, e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) =>
+                      handleOtpChange(index, e.target.value.replace(/\D/g, ""))
+                    }
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     onPaste={handlePaste}
                     maxLength="1"
@@ -226,10 +275,19 @@ function LoginScreen() {
                 ))}
               </div>
             </div>
-            <button type="submit" className="btn btn-primary btn-lg w-100 mb-3" disabled={loading || !isOtpComplete}>
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg w-100 mb-3"
+              disabled={loading || !isOtpComplete}
+            >
               {loading ? "Verifying..." : "Verify OTP"}
             </button>
-            <button type="button" className="btn btn-link w-100 text-decoration-none" onClick={() => setShowOtp(false)} disabled={loading}>
+            <button
+              type="button"
+              className="btn btn-link w-100 text-decoration-none"
+              onClick={() => setShowOtp(false)}
+              disabled={loading}
+            >
               <span>Change Mobile Number</span>
             </button>
           </form>
