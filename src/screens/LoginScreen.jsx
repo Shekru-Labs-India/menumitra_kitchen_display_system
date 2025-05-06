@@ -58,16 +58,15 @@ function LoginScreen() {
         if (result.role === "chef") {
           setShowOtp(true);
         } else {
-          setError(
-            "Access denied for this role."
-          );
+          setError("Access denied for this role.");
         }
       } else {
         if (result.isMaxSessionsError) {
           setError(
             <div className="text-center text-danger mt-2">
               <p className="mb-0">
-                Maximum active sessions reached. Please logout from other devices before trying again.
+                Maximum active sessions reached. Please logout from other
+                devices before trying again.
               </p>
             </div>
           );
@@ -183,105 +182,116 @@ function LoginScreen() {
   }, [showOtp]); // This will run when showOtp changes
 
   return (
-    <div className="login-screen-container d-flex align-items-center justify-content-center min-vh-100 bg-light">
-      <div className="card shadow-lg p-4">
-        <div className="text-center mb-4">
-          <div className="d-flex justify-content-center align-items-center mb-3">
-            <img src={logo} alt="Logo" className="logo" />
-            <h2 className="fw-bold text-black ms-3">MenuMitra</h2>
-          </div>
-          <p className="text-muted">Kitchen Display System</p>
+    <div className="login-screen-container d-flex align-items-center justify-content-center min-vh-100 bg-light px-3">
+    <div
+      className="card shadow-lg p-5 border-0 rounded-4"
+      style={{ maxWidth: "460px", width: "100%", height: "300px" }}
+    >
+      <div className="text-center mb-4">
+        <div className="d-flex justify-content-center align-items-center mb-3">
+          <img src={logo} alt="Logo" className="logo" style={{ width: 40 }} />
+          <h2 className="fw-bold text-black ms-3 m-0">MenuMitra</h2>
         </div>
-
-        {!showOtp ? (
-          <form onSubmit={handleMobileSubmit}>
-            <div className="mb-4">
-              <label
-                htmlFor="mobile"
-                className="form-label text-muted fw-bold small"
-              >
-                Mobile Number
-              </label>
-              <div className="input-group">
-                <span className="input-group-text bg-white">+91</span>
+        <p className="text-muted m-0">Kitchen Display System</p>
+      </div>
+  
+      {!showOtp ? (
+        <form onSubmit={handleMobileSubmit}>
+          <div className="mb-3">
+            <label
+              htmlFor="mobile"
+              className="form-label text-muted fw-bold small"
+            >
+              Mobile Number
+            </label>
+            <div className="input-group">
+              <span className="input-group-text bg-white border rounded-start">
+                +91
+              </span>
+              <input
+                type="tel"
+                className={`form-control form-control-lg fs-5 ${
+                  error ? "is-invalid" : ""
+                }`}
+                id="mobile"
+                value={mobileNumber}
+                onChange={handleMobileNumberChange}
+                maxLength="10"
+                required
+                disabled={loading}
+                placeholder="Enter mobile number"
+                autoFocus
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+            </div>
+            {error && (
+              <div className="text-danger mt-2 small fw-semibold text-center">
+                {error}
+              </div>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg w-100 mt-3"
+            disabled={loading || !isMobileNumberValid(mobileNumber)}
+          >
+            {loading ? "Sending OTP..." : "Send OTP"}
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleVerifyOTP}>
+          <div className="mb-4">
+            <label
+              htmlFor="otp-1"
+              className="form-label text-center text-muted fw-bold small"
+            >
+              Enter OTP
+            </label>
+            <div className="d-flex gap-4 justify-content-center">
+              {[0, 1, 2, 3].map((index) => (
                 <input
-                  type="tel"
-                  className={`fs-5 border form-control-lg ${
-                    error ? "input-error" : "border-gray"
-                  }`}
-                  id="mobile"
-                  value={mobileNumber}
-                  onChange={handleMobileNumberChange}
-                  maxLength="10"
+                  key={index}
+                  ref={otpRefs[index]}
+                  type="text"
+                  className="form-control form-control-lg text-center fw-bold otp-input"
+                  style={{ width: "55px" }}
+                  value={otpValues[index]}
+                  onChange={(e) =>
+                    handleOtpChange(index, e.target.value.replace(/\D/g, ""))
+                  }
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  maxLength="1"
                   required
                   disabled={loading}
-                  placeholder="Enter mobile number"
-                  autoFocus
+                  autoComplete="off"
                   inputMode="numeric"
-                  pattern="[0-9]*"
+                  pattern="\d"
                 />
-              </div>
-              <div className="error-message">{error}</div>
+              ))}
             </div>
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg w-100"
-              disabled={loading || !isMobileNumberValid(mobileNumber)}
-            >
-              {loading ? "Sending OTP..." : "Send OTP"}
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleVerifyOTP}>
-            <div className="mb-4">
-              <label
-                htmlFor="otp-1"
-                className="form-label text-center text-muted fw-bold small"
-              >
-                Enter OTP
-              </label>
-              <div className="d-flex gap-5 justify-content-center">
-                {[0, 1, 2, 3].map((index) => (
-                  <input
-                    key={index}
-                    ref={otpRefs[index]}
-                    type="text"
-                    className="border border-gray form-control-lg text-center fw-bold otp-input"
-                    value={otpValues[index]}
-                    onChange={(e) =>
-                      handleOtpChange(index, e.target.value.replace(/\D/g, ""))
-                    }
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    onPaste={handlePaste}
-                    maxLength="1"
-                    required
-                    disabled={loading}
-                    autoComplete="off"
-                    inputMode="numeric"
-                    pattern="\d"
-                  />
-                ))}
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg w-100 mb-3"
-              disabled={loading || !isOtpComplete}
-            >
-              {loading ? "Verifying..." : "Verify OTP"}
-            </button>
-            <button
-              type="button"
-              className="btn btn-link w-100 text-decoration-none"
-              onClick={() => setShowOtp(false)}
-              disabled={loading}
-            >
-              <span>Change Mobile Number</span>
-            </button>
-          </form>
-        )}
-      </div>
+          </div>
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg w-100 mb-3"
+            disabled={loading || !isOtpComplete}
+          >
+            {loading ? "Verifying..." : "Verify OTP"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-link w-100 text-decoration-none"
+            onClick={() => setShowOtp(false)}
+            disabled={loading}
+          >
+            <span>Change Mobile Number</span>
+          </button>
+        </form>
+      )}
     </div>
+  </div>
+  
   );
 }
 
