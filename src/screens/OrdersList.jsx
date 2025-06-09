@@ -67,7 +67,7 @@ function OrdersList() {
 
   const fetchOrders = async () => {
     const accessToken = localStorage.getItem("access"); // Retrieve the access token
-    const device_token = "8RTudo2zku0MvVQklvs7sMNcroVw4oDSK9LcXqLS04iXkuJAufKZ0tWX9CSjWfxfT.a0y5tEPriR5Je9cdQRTSBCmyVRzQ6TTofe";
+    const device_token = localStorage.getItem("device_token");
 
     if (!accessToken) {
       console.error("No access token found");

@@ -76,6 +76,7 @@ export const authService = {
         localStorage.setItem("access", result.access);
         localStorage.setItem("device_id", deviceSessId);
         localStorage.setItem("last_activity", new Date().getTime().toString());
+        localStorage.setItem("device_token", result.device_token);
 
         // Store the complete auth data for easy access
         const authData = {
