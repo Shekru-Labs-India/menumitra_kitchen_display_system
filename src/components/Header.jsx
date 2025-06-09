@@ -26,7 +26,7 @@ const userId = localStorage.getItem("user_id");
           user_id: userId,
           role: "chef",
           app: "chef", // Assuming 'owner' is the application name
-          device_token: "8RTudo2zku0MvVQklvs7sMNcroVw4oDSK9LcXqLS04iXkuJAufKZ0tWX9CSjWfxfT.a0y5tEPriR5Je9cdQRTSBCmyVRzQ6TTofe",
+          device_token: localStorage.getItem("device_token"),
 
         };
     
@@ -77,7 +77,7 @@ const userId = localStorage.getItem("user_id");
         const response = await axios.post('https://men4u.xyz/common_api/call_waiter', {
           outlet_id: parseInt(outlet_id),
           user_id: parseInt(user_id),
-          device_token: "8RTudo2zku0MvVQklvs7sMNcroVw4oDSK9LcXqLS04iXkuJAufKZ0tWX9CSjWfxfT.a0y5tEPriR5Je9cdQRTSBCmyVRzQ6TTofe",
+          device_token: localStorage.getItem("device_token"),
 
       }, {
           headers: {
