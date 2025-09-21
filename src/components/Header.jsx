@@ -26,6 +26,7 @@ const userId = localStorage.getItem("user_id");
           user_id: userId,
           role: "chef",
           app: "chef", // Assuming 'owner' is the application name
+          device_token: localStorage.getItem("device_token"),
         };
     
         // Make API request to logout using fetch
