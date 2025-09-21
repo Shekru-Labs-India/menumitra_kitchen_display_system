@@ -1,6 +1,9 @@
 // Base API URL
 export const API_URL = "https://api.menumitra.com"; // Replace with your actual API URL
 
+// Base URL for MenuMitra APIs
+export const BASE_API_URL = "https://menusmitra.xyz";
+
 // Firebase Config
 export const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCoPZ3_Ktah8UBBSgh0_OXL5SQwUtL6Wok",

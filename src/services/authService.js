@@ -1,12 +1,12 @@
 import axios from "axios";
-import { API_URL } from "../config";
+import { API_URL, BASE_API_URL } from "../config";
 
 export const authService = {
   // Send OTP
   sendOTP: async (mobileNumber) => {
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/user_login",
+        `${BASE_API_URL}/common_api/user_login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,7 +42,7 @@ export const authService = {
     
       try {
         const response = await fetch(
-          "https://men4u.xyz/kitchen_display_system_api/kds_verify_otp",
+          `${BASE_API_URL}/kitchen_display_system_api/kds_verify_otp`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -50,8 +50,10 @@ export const authService = {
               mobile: mobile,
 
               otp,
-              fcm_token: fcmToken ,
+              fcm_token: "e5Cq1shUT8-DY6y:APA91bFeFAKE-TOKEN-0000000000000000000000000001" ,
               device_sessid: deviceSessId, // Pass the generated session ID
+              device_id:"3ea1200c85a512872e0a240e2bb3651215245bf9fb9e127454a377f677dcfec5",
+              device_model: "3ea1200c85a512872e0a240e2bb3651215245bf9fb9e127454a377f677dcfec5"
             }),
           }
         );

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, use } from "react";
 import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { BASE_API_URL } from "../config";
 
 const styles = `
   .circular-countdown {
@@ -76,7 +77,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/cds_kds_order_listview",
+        `${BASE_API_URL}/common_api/cds_kds_order_listview`,
         {
           method: "POST",
           headers: {
@@ -133,7 +134,7 @@ function OrdersList() {
   
     try {
       const response = await fetch(
-        "https://men4u.xyz/common_api/update_order_status",
+        `${BASE_API_URL}/common_api/update_order_status`,
         {
           method: "POST",
           headers: {
@@ -290,7 +291,7 @@ function OrdersList() {
   
       try {
         const response = await fetch(
-          "https://men4u.xyz/common_api/update_order_status",
+          `${BASE_API_URL}/common_api/update_order_status`,
           {
             method: "POST",
             headers: {

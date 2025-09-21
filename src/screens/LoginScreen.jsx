@@ -65,21 +65,21 @@ function LoginScreen() {
     setLoading(true);
 
     try {
-      const fcmToken = await generateFCMToken();
-      if (!fcmToken) {
-        window.showToast("error", "Failed to generate notification token");
-        return;
-      }
+      // const fcmToken = await generateFCMToken();
+      // if (!fcmToken) {
+      //   window.showToast("error", "Failed to generate notification token");
+      //   return;
+      // }
 
       const combinedOtp = otpValues.join("");
-      const response = await authService.verifyOTP(mobileNumber, combinedOtp, fcmToken);
+      const response = await authService.verifyOTP(mobileNumber, combinedOtp,null);
 
       if (response.st === 1) {
         localStorage.setItem("user_id", response.user_id);
         localStorage.setItem("outlet_id", response.outlet_id);
         localStorage.setItem("outlet_name", response.outlet_name);
         localStorage.setItem("image", response.image);
-        localStorage.setItem("fcmToken", fcmToken);
+        // localStorage.setItem("fcmToken", fcmToken);
         localStorage.setItem("access", response.access);
 
         navigate("/orders");

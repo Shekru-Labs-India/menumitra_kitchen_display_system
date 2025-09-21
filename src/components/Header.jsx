@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import hotelLogo from "../assets/Hotel.png";
 import { messaging } from '../firebase-config';
 import { getToken, onMessage } from 'firebase/messaging';
-import { VAPID_KEY } from '../config';
+import { VAPID_KEY, BASE_API_URL } from '../config';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 function Header() {
@@ -29,7 +29,7 @@ const userId = localStorage.getItem("user_id");
         };
     
         // Make API request to logout using fetch
-        const response = await fetch("https://men4u.xyz/common_api/logout", {
+        const response = await fetch(`${BASE_API_URL}/common_api/logout`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -72,7 +72,7 @@ const userId = localStorage.getItem("user_id");
       return;
     }
     try {
-        const response = await axios.post('https://men4u.xyz/common_api/call_waiter', {
+        const response = await axios.post(`${BASE_API_URL}/common_api/call_waiter`, {
           outlet_id: parseInt(outlet_id),
           user_id: parseInt(user_id),
       }, {
