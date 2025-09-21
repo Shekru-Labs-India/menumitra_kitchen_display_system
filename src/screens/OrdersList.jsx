@@ -84,7 +84,10 @@ function OrdersList() {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${accessToken}`, // Include the access token in the header
           },
-          body: JSON.stringify({ outlet_id: outletId }),
+          body: JSON.stringify({ 
+            outlet_id: outletId,
+            device_token: localStorage.getItem("device_token")
+          })
         }
       );
   
