@@ -76,6 +76,7 @@ const userId = localStorage.getItem("user_id");
         const response = await axios.post(`${BASE_API_URL}/common_api/call_waiter`, {
           outlet_id: parseInt(outlet_id),
           user_id: parseInt(user_id),
+          device_token: localStorage.getItem("device_token"),
       }, {
           headers: {
               Authorization: `Bearer ${accessToken}`,
