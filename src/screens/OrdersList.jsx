@@ -149,6 +149,7 @@ function OrdersList() {
             order_id: orderId,
             order_status: "served",
             user_id: userId,
+            device_token: localStorage.getItem("device_token"),
           }),
         }
       );
@@ -306,6 +307,7 @@ function OrdersList() {
               order_id: orderId,
               order_status: "cancelled",
               user_id: localStorage.getItem("user_id"),
+              device_token: localStorage.getItem("device_token"),
             }),
           }
         );
