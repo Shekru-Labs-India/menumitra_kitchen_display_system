@@ -163,14 +163,12 @@ function OrdersList() {
       const result = await response.json();
   
       if (result.st === 1) {
-        alert(result.msg);
         fetchOrders(); // Refresh orders after successful update
       } else {
-        alert(result.msg || "Failed to update order status");
+        // Order status update failed
       }
     } catch (error) {
       console.error("Error updating order status:", error);
-      alert("Error updating order status");
     }
   };
   
@@ -320,14 +318,12 @@ function OrdersList() {
   
         const result = await response.json();
         if (result.st === 1) {
-          alert(result.msg);
           fetchOrders();
         } else {
-          alert(result.msg || "Failed to cancel order");
+          // Order cancellation failed
         }
       } catch (error) {
         console.error("Error cancelling order:", error);
-        alert("Error cancelling order");
       }
     };
   
